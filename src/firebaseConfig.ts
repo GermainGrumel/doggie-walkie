@@ -18,7 +18,19 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
 
-
+export function getCurrentUser() {
+    return new Promise((resolve, reject)=>{
+    const unsubscribe = firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+            resolve(user)
+        } else {
+            resolve(null)
+            }
+            unsubscribe()
+        
+    })
+})
+}
 export async function loginUser(username: string, password: string) {
     const email = `${username}@outlook.com`
     try {
@@ -34,13 +46,13 @@ export async function loginUser(username: string, password: string) {
 export async function registerUser(username: string, password: string) {
     const email = `${username}@outlook.com`
     try {
-        const res = await firebase.auth().createUserWithEmailAndPassword(username, password)
-        console.log(res)
+        const res = await firebase.auth().createUserWithEmailAndPassword(email, password)
+        console.log("res",res)
         return true
 
     } catch (error:any) {
         console.log("ERROR", error)
-        toast(error.message)
+        toast(error.message, 4000)
         return false
     }
 

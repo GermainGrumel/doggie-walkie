@@ -29,11 +29,11 @@ const RegisterUser: React.FC = () => {
       return toast("Username and password required");
     }
     const res = await registerUser(username, password);
+    if (res) {
+      toast("You have registered successfully !");
+    }
   }
-  console.log("cpassword", cpassword);
 
-  console.log("password", password);
-  console.log("text", username);
   return (
     <IonPage>
       <IonHeader>

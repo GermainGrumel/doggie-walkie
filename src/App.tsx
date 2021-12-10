@@ -4,6 +4,7 @@ import {
   IonIcon,
   IonLabel,
   IonRouterOutlet,
+  IonSpinner,
   IonTabBar,
   IonTabButton,
   IonTabs,
@@ -35,33 +36,20 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "./theme/variables.css";
-
-const App: React.FC = () => (
-  <IonApp>
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "./firebaseConfig";
+const RoutingSystem: React.FC = () => {
+  return (
     <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet>
-          <Route exact path="/tab1">
-            <Tab1 />
-          </Route>
-          <Route exact path="/tab2">
-            <Tab2 />
-          </Route>
-          <Route path="/tab3">
-            <Tab3 />
-          </Route>
-          <Route path="/registerdog">
-            <RegisterDog />
-          </Route>
-          <Route path="/login">
-            <Login />
-          </Route>
-          <Route path="/register-user">
-            <RegisterUser />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/tab1" />
-          </Route>
+          <Route path="/tab1" component={Tab1} exact />
+          <Route path="/tab2" component={Tab2} exact />
+          <Route path="/tab3" component={Tab3} exact />
+          <Route path="/registerdog" component={RegisterDog} exact />
+          <Route path="/login" component={Login} exact />
+          <Route path="/register-user" component={RegisterUser} exact />
+          <Route path="/" component={Tab1} exact />
         </IonRouterOutlet>
 
         <IonTabBar slot="bottom">
@@ -84,7 +72,21 @@ const App: React.FC = () => (
         </IonTabBar>
       </IonTabs>
     </IonReactRouter>
-  </IonApp>
-);
+  );
+};
+const App: React.FC = () => {
+  const [busy, setBusy] = useState(true);
+  useEffect(() => {
+    getCurrentUser().then((user) => {
+      if (user) {
+        window.location.href = "/home";
+      } else {
+        window.location.href = "/";
+      }
+      setBusy(false);
+    });
+  }, []);
 
+  return <IonApp>{busy ? <IonSpinner /> : <RoutingSystem />}</IonApp>;
+};
 export default App;

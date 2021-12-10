@@ -12,12 +12,12 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-
+import { Link } from "react-router-dom";
+import { toast } from "../toast";
 const RegisterDog: React.FC = () => {
   const [dogName, setDogName] = useState<string>();
   const [dogAge, setDogAge] = useState<number>();
-  console.log("dogAge", dogAge);
-  console.log("text", dogName);
+
   return (
     <IonPage>
       <IonHeader>

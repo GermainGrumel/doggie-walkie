@@ -14,8 +14,8 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { Link } from "react-router-dom";
-import { toast } from "../toast";
-import { registerUser } from "../firebaseConfig";
+import { toast } from "../../toast";
+import { registerUser } from "../../firebaseConfig";
 const RegisterUser: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");

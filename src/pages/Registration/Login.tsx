@@ -32,7 +32,7 @@ const Login: React.FC = () => {
       toast("Error logging with your credentials");
     } else {
       dispatch(setUserState(res.user.email));
-      history.replace("/tab1");
+      history.replace("/");
       toast("You have logged in!");
     }
     setBusy(false);
@@ -41,7 +41,7 @@ const Login: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Connectez vous</IonTitle>
+          <IonTitle>Connectez-vous</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>

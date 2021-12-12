@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
   IonButton,
-  IonCol,
   IonContent,
   IonHeader,
+  IonImg,
   IonInput,
   IonItem,
   IonLabel,
@@ -12,8 +12,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { Link } from "react-router-dom";
-import { toast } from "../../toast";
+
 const RegisterDog: React.FC = () => {
   const [dogName, setDogName] = useState<string>();
   const [dogAge, setDogAge] = useState<number>();
@@ -26,6 +25,7 @@ const RegisterDog: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+        <IonImg src="assets/img/registerDogs.png" alt="Bien joué !" />{" "}
         <IonList>
           <IonItem>
             <IonLabel position="floating">Nom du chien</IonLabel>

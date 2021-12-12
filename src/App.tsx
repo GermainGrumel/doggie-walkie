@@ -1,17 +1,7 @@
-import { Redirect, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
 import { setUserState } from "./redux/actions";
-import {
-  IonApp,
-  IonIcon,
-  IonLabel,
-  IonRouterOutlet,
-  IonSpinner,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
-} from "@ionic/react";
+import { IonApp, IonRouterOutlet, IonSpinner } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { ellipse, square, triangle } from "ionicons/icons";
 import Home from "./pages/Home";
 import Login from "./pages/Registration/Login";
 import RegisterDog from "./pages/Registration/RegisterDog";
@@ -41,15 +31,15 @@ import { useDispatch } from "react-redux";
 const RoutingSystem: React.FC = () => {
   return (
     <IonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route path="/" component={Home} exact />
-          <Route path="/register-dog" component={RegisterDog} exact />
-          <Route path="/login" component={Login} exact />
-          <Route path="/register-user" component={RegisterUser} exact />
-        </IonRouterOutlet>
+      {/* <IonTabs> */}
+      <IonRouterOutlet>
+        <Route path="/" component={Home} exact />
+        <Route path="/register-dog" component={RegisterDog} exact />
+        <Route path="/login" component={Login} exact />
+        <Route path="/register-user" component={RegisterUser} exact />
+      </IonRouterOutlet>
 
-        <IonTabBar slot="bottom">
+      {/* <IonTabBar slot="bottom">
           <IonTabButton tab="tab1" href="/tab1">
             <IonIcon icon={triangle} />
             <IonLabel>Tab 1</IonLabel>
@@ -59,26 +49,31 @@ const RoutingSystem: React.FC = () => {
             <IonLabel>Tab 2</IonLabel>
           </IonTabButton>
         </IonTabBar>
-      </IonTabs>
+      </IonTabs>*/}
     </IonReactRouter>
   );
 };
 const App: React.FC = () => {
-  const [busy, setBusy] = useState(true);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    getCurrentUser().then((user: any) => {
-      console.log("user", user);
-      if (user) {
-        dispatch(setUserState(user.email));
-        window.history.replaceState({}, "", "/");
-      } else {
-        window.history.replaceState({}, "", "/login");
-      }
-      setBusy(false);
-    });
-  }, []);
+  // const [busy, setBusy] = useState(true);
+  // const dispatch = useDispatch();
+  // useEffect(() => {
+  //   getCurrentUser().then((user: any) => {
+  //     console.log("user", user);
+  //     if (user) {
+  //       dispatch(setUserState(user.email));
+  //       window.history.replaceState({}, "", "/register-dog");
+  //     } else {
+  //       window.history.replaceState({}, "", "/login");
+  //     }
+  //     setBusy(false);
+  //   });
+  // }, []);
 
-  return <IonApp>{busy ? <IonSpinner /> : <RoutingSystem />}</IonApp>;
+  // return <IonApp>{busy ? <IonSpinner /> : <RoutingSystem />}</IonApp>;
+  return (
+    <IonApp>
+      <RoutingSystem />
+    </IonApp>
+  );
 };
 export default App;

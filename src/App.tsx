@@ -1,4 +1,5 @@
 import { Redirect, Route } from "react-router-dom";
+import { setUserState } from "./redux/actions";
 import {
   IonApp,
   IonIcon,
@@ -11,12 +12,10 @@ import {
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { ellipse, square, triangle } from "ionicons/icons";
-import Tab1 from "./pages/Tab1";
-import Tab2 from "./pages/Tab2";
-import Tab3 from "./pages/Tab3";
-import RegisterDog from "./pages/RegisterDog";
-import Login from "./pages/Login";
-import RegisterUser from "./pages/RegisterUser";
+import Home from "./pages/Home";
+import Login from "./pages/Registration/Login";
+import RegisterDog from "./pages/Registration/RegisterDog";
+import RegisterUser from "./pages/Registration/RegisterUser";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -38,18 +37,16 @@ import "@ionic/react/css/display.css";
 import "./theme/variables.css";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "./firebaseConfig";
+import { useDispatch } from "react-redux";
 const RoutingSystem: React.FC = () => {
   return (
     <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet>
-          <Route path="/tab1" component={Tab1} exact />
-          <Route path="/tab2" component={Tab2} exact />
-          <Route path="/tab3" component={Tab3} exact />
-          <Route path="/registerdog" component={RegisterDog} exact />
+          <Route path="/" component={Home} exact />
+          <Route path="/register-dog" component={RegisterDog} exact />
           <Route path="/login" component={Login} exact />
           <Route path="/register-user" component={RegisterUser} exact />
-          <Route path="/" component={Tab1} exact />
         </IonRouterOutlet>
 
         <IonTabBar slot="bottom">
@@ -57,17 +54,9 @@ const RoutingSystem: React.FC = () => {
             <IonIcon icon={triangle} />
             <IonLabel>Tab 1</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="tab2" href="/tab2">
+          <IonTabButton tab="tab2" href="/register-dog">
             <IonIcon icon={ellipse} />
             <IonLabel>Tab 2</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab3" href="/tab3">
-            <IonIcon icon={square} />
-            <IonLabel>Tab 3</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="registerdog" href="/registerdog">
-            <IonIcon icon={triangle} />
-            <IonLabel>RegisterDog</IonLabel>
           </IonTabButton>
         </IonTabBar>
       </IonTabs>
@@ -76,12 +65,15 @@ const RoutingSystem: React.FC = () => {
 };
 const App: React.FC = () => {
   const [busy, setBusy] = useState(true);
+  const dispatch = useDispatch();
   useEffect(() => {
-    getCurrentUser().then((user) => {
+    getCurrentUser().then((user: any) => {
+      console.log("user", user);
       if (user) {
-        window.location.href = "/home";
+        dispatch(setUserState(user.email));
+        window.history.replaceState({}, "", "/");
       } else {
-        window.location.href = "/";
+        window.history.replaceState({}, "", "/login");
       }
       setBusy(false);
     });

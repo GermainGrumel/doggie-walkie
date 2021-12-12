@@ -13,7 +13,7 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { Link } from "react-router-dom";
-import { toast } from "../toast";
+import { toast } from "../../toast";
 const RegisterDog: React.FC = () => {
   const [dogName, setDogName] = useState<string>();
   const [dogAge, setDogAge] = useState<number>();

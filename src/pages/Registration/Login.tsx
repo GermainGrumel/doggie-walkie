@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router";
 import {
   IonButton,
   IonContent,
@@ -12,25 +13,30 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { loginUser } from "../firebaseConfig";
 import { Link } from "react-router-dom";
-import { toast } from "../toast";
+import { toast } from "../../toast";
+import { loginUser } from "../../firebaseConfig";
+import { setUserState } from "../../redux/actions";
+import { useDispatch } from "react-redux";
 const Login: React.FC = () => {
+  const [busy, setBusy] = useState<boolean>(false);
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [cpassword, setCPassword] = useState<string>("");
 
+  const dispatch = useDispatch();
+  const history = useHistory();
   async function login() {
-    const res = await loginUser(username, password);
+    setBusy(true);
+    const res: any = await loginUser(username, password);
     if (!res) {
       toast("Error logging with your credentials");
     } else {
+      dispatch(setUserState(res.user.email));
+      history.replace("/tab1");
       toast("You have logged in!");
     }
+    setBusy(false);
   }
-
-  console.log("password", password);
-  console.log("text", username);
   return (
     <IonPage>
       <IonHeader>

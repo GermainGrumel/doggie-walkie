@@ -31,14 +31,17 @@ export function getCurrentUser() {
     })
 })
 }
+export async function logoutUser() {
+    console.log("Logging out...")
+    return firebase.auth().signOut()
+}
 export async function loginUser(username: string, password: string) {
     const email = `${username}@outlook.com`
     try {
         const res = await firebase.auth().signInWithEmailAndPassword(email, password)
-        console.log(res)
-        return true
-    } catch (error) {
-        console.log(error)
+        return res
+    } catch (error:any) {
+        toast(error.message, 4000)
         return false
     }
 }

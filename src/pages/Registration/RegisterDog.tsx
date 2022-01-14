@@ -16,7 +16,6 @@ import {
 const RegisterDog: React.FC = () => {
   const [dogName, setDogName] = useState<string>();
   const [dogAge, setDogAge] = useState<number>();
-
   return (
     <IonPage>
       <IonHeader>
@@ -25,7 +24,6 @@ const RegisterDog: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <IonImg src="assets/img/registerDogs.png" alt="Bien joué !" />{" "}
         <IonList>
           <IonItem>
             <IonLabel position="floating">Nom du chien</IonLabel>
@@ -55,5 +53,4 @@ const RegisterDog: React.FC = () => {
     </IonPage>
   );
 };
-
 export default RegisterDog;

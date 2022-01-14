@@ -31,6 +31,7 @@ const RegisterUser: React.FC = () => {
     const res = await registerUser(username, password);
     if (res) {
       toast("You have registered successfully !");
+      window.history.replaceState({}, "", "/home");
     }
   }
 
@@ -38,16 +39,16 @@ const RegisterUser: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Connectez vous</IonTitle>
+          <IonTitle>Créer un compte</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
         <IonList>
           <IonItem>
-            <IonLabel position="floating">Nom d'utilisateur</IonLabel>
+            <IonLabel position="floating">Email</IonLabel>
             <IonInput
               required
-              placeholder="Entrez le nom de votre chien"
+              placeholder="Entrez votre email"
               onIonChange={(e) => setUsername(e.detail.value!)}
               clearInput
               value={username}
@@ -58,7 +59,7 @@ const RegisterUser: React.FC = () => {
             <IonInput
               type="password"
               required
-              placeholder="Entrez le nom de votre chien"
+              placeholder="Entrez un mot de passe"
               onIonChange={(e) => setPassword(e.detail.value!)}
               clearInput
               value={password}
@@ -71,7 +72,7 @@ const RegisterUser: React.FC = () => {
             <IonInput
               type="password"
               required
-              placeholder="Confirmez mot de passe "
+              placeholder="Confirmez votre mot de passe "
               onIonChange={(e) => setCPassword(e.detail.value!)}
               clearInput
               value={cpassword}

@@ -17,6 +17,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
+console.log(`firebaseConfig`, app)
+console.log(`firebaseConfig`, firebase.auth().currentUser)
 
 export function getCurrentUser() {
     return new Promise((resolve, reject)=>{
@@ -32,11 +34,12 @@ export function getCurrentUser() {
 })
 }
 export async function logoutUser() {
+    firebase.auth().signOut()
     console.log("Logging out...")
     return firebase.auth().signOut()
 }
 export async function loginUser(username: string, password: string) {
-    const email = `${username}@outlook.com`
+    const email = `${username}` // vérifier mail
     try {
         const res = await firebase.auth().signInWithEmailAndPassword(email, password)
         return res
@@ -47,7 +50,8 @@ export async function loginUser(username: string, password: string) {
 }
 
 export async function registerUser(username: string, password: string) {
-    const email = `${username}@outlook.com`
+    const email =  username// ici vérifier que la string respecte bien le mail firebase?.auth()?.currentUser?.email
+    // const pseudo = username //on affiche le username
     try {
         const res = await firebase.auth().createUserWithEmailAndPassword(email, password)
         console.log("res",res)

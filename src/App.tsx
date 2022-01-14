@@ -1,12 +1,19 @@
 import { Route } from "react-router-dom";
 import { setUserState } from "./redux/actions";
-import { IonApp, IonRouterOutlet, IonSpinner } from "@ionic/react";
+import {
+  IonApp,
+  IonRouterOutlet,
+  IonSpinner,
+  IonSplitPane,
+} from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import Home from "./pages/Home";
 import Login from "./pages/Registration/Login";
 import RegisterDog from "./pages/Registration/RegisterDog";
 import RegisterUser from "./pages/Registration/RegisterUser";
+import Profile from "./pages/Profile";
 
+import Menu from "./components/Menu";
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
 
@@ -32,12 +39,16 @@ const RoutingSystem: React.FC = () => {
   return (
     <IonReactRouter>
       {/* <IonTabs> */}
-      <IonRouterOutlet>
-        <Route path="/" component={Home} exact />
-        <Route path="/register-dog" component={RegisterDog} exact />
-        <Route path="/login" component={Login} exact />
-        <Route path="/register-user" component={RegisterUser} exact />
-      </IonRouterOutlet>
+      <IonSplitPane contentId="main">
+        <Menu />
+        <IonRouterOutlet id="main">
+          <Route path="/" component={Home} />
+          <Route path="/register-dog" component={RegisterDog} />
+          <Route path="/login" component={Login} />
+          <Route path="/register-user" component={RegisterUser} />
+          <Route path="/profile" component={Profile} />
+        </IonRouterOutlet>
+      </IonSplitPane>
 
       {/* <IonTabBar slot="bottom">
           <IonTabButton tab="tab1" href="/tab1">
@@ -54,26 +65,25 @@ const RoutingSystem: React.FC = () => {
   );
 };
 const App: React.FC = () => {
-  // const [busy, setBusy] = useState(true);
-  // const dispatch = useDispatch();
-  // useEffect(() => {
-  //   getCurrentUser().then((user: any) => {
-  //     console.log("user", user);
-  //     if (user) {
-  //       dispatch(setUserState(user.email));
-  //       window.history.replaceState({}, "", "/register-dog");
-  //     } else {
-  //       window.history.replaceState({}, "", "/login");
-  //     }
-  //     setBusy(false);
-  //   });
-  // }, []);
+  const [busy, setBusy] = useState(true);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    getCurrentUser().then((user: any) => {
+      console.log("user", user);
+      if (user) {
+        dispatch(setUserState(user.email));
+      } else {
+        window.history.replaceState({}, "", "/login");
+      }
+      setBusy(false);
+    });
+  }, []);
 
-  // return <IonApp>{busy ? <IonSpinner /> : <RoutingSystem />}</IonApp>;
-  return (
-    <IonApp>
-      <RoutingSystem />
-    </IonApp>
-  );
+  return <IonApp>{busy ? <IonSpinner /> : <RoutingSystem />}</IonApp>;
+  // return (
+  //   <IonApp>
+  //     <RoutingSystem />
+  //   </IonApp>
+  // );
 };
 export default App;

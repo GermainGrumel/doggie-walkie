@@ -1,24 +1,15 @@
 import {
   IonButton,
-  IonButtons,
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonCol,
   IonContent,
-  IonHeader,
   IonImg,
-  IonItem,
-  IonList,
   IonLoading,
-  IonMenu,
   IonPage,
-  IonRouterOutlet,
   IonRow,
-  IonSplitPane,
   IonText,
-  IonTitle,
-  IonToolbar,
 } from "@ionic/react";
 import { useSelector } from "react-redux";
 import { logoutUser } from "../firebaseConfig";
@@ -38,24 +29,6 @@ const Home: React.FC = () => {
   }
   return (
     <IonPage>
-      <IonMenu side="end" type="push" contentId="main">
-        <IonHeader>
-          <IonToolbar color="danger">
-            <IonTitle>End Menu</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent>
-          <IonList>
-            <IonItem>Menu Item</IonItem>
-            <IonItem>Menu Item</IonItem>
-            <IonItem>Menu Item</IonItem>
-            <IonItem>Menu Item</IonItem>
-            <IonItem>Menu Item</IonItem>
-          </IonList>
-        </IonContent>
-      </IonMenu>
-      <IonRouterOutlet id="main">a</IonRouterOutlet>
-
       <IonContent className="ion-align-items-center ion-justify-content-center">
         <IonRow className="ion-align-items-center ion-justify-content-center">
           <IonCol
@@ -78,6 +51,7 @@ const Home: React.FC = () => {
                 Doggy Walky is a service that allows you to register your dog so
                 people can walk it when you're too busy.
               </IonCardContent>
+              <IonButton href="/register-dog">Register my dog</IonButton>
             </IonCard>
           </IonCol>
 
@@ -92,6 +66,7 @@ const Home: React.FC = () => {
                 Doggy Walky is a service that allows you to walk other people
                 dogs and earn money for it.
               </IonCardContent>
+              <IonButton href="/walk-dog">Walk a dog</IonButton>
             </IonCard>
           </IonCol>
         </IonRow>

@@ -1,6 +1,7 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import { toast } from './toast';
+
 // https://stackoverflow.com/questions/69139443/property-auth-does-not-exist-on-type-typeof-import-firebase-auth
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -42,6 +43,7 @@ export async function loginUser(username: string, password: string) {
     const email = `${username}` // vérifier mail
     try {
         const res = await firebase.auth().signInWithEmailAndPassword(email, password)
+        console.log('res', res);
         return res
     } catch (error:any) {
         toast(error.message, 4000)
@@ -49,18 +51,56 @@ export async function loginUser(username: string, password: string) {
     }
 }
 
-export async function registerUser(username: string, password: string) {
-    const email =  username// ici vérifier que la string respecte bien le mail firebase?.auth()?.currentUser?.email
-    // const pseudo = username //on affiche le username
+// export async function registerUser(username: string, password: string) {
+//     const email =  username// ici vérifier que la string respecte bien le mail firebase?.auth()?.currentUser?.email
+//     // const pseudo = username //on affiche le username
+//     try {
+//         const res = await firebase.auth().createUserWithEmailAndPassword(email, password)
+//         console.log("res",res)
+//         return true
+
+//     } catch (error:any) {
+//         console.log("ERROR", error)
+//         toast(error.message, 4000)
+//         return false
+//     }
+// }
+
+export async function createUser(userData: any) {
     try {
-        const res = await firebase.auth().createUserWithEmailAndPassword(email, password)
-        console.log("res",res)
-        return true
+      const userCredential = await firebase
+        .auth()
+        .createUserWithEmailAndPassword(
+          userData.get('userName'),
+          userData.get('password')
+        );
+            const userId = userCredential.user?.uid;
+            console.log('userId', userId);
+      await firebase
+        .database()
+        .ref('users/' + userId + '/')
+        .set({
+          fullName: userData.get('fullName'),
+          phoneNumber: userData.get('phoneNumber')
+        });
 
-    } catch (error:any) {
-        console.log("ERROR", error)
-        toast(error.message, 4000)
-        return false
+      return userId;  //As per your comment below
+
+    } catch (error) {
+      return error;
     }
+  };
 
+export function userAvailabilityStatus() {
+    return new Promise((resolve, reject)=>{
+    firebase.auth().onAuthStateChanged(function (user : any) {
+        if (user) {
+            user["isAvailable"] = false;
+            console.log('CLAC', user);
+            resolve(user)
+        } else {
+            resolve(null)
+            }
+    })
+})
 }

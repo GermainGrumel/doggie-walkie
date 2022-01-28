@@ -15,7 +15,8 @@ import {
 } from "@ionic/react";
 import { Link } from "react-router-dom";
 import { toast } from "../../toast";
-import { registerUser } from "../../firebaseConfig";
+import { createUser } from "../../firebaseConfig";
+// import { registerUser } from "../../firebaseConfig";
 const RegisterUser: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -28,7 +29,9 @@ const RegisterUser: React.FC = () => {
     if (username.trim() === "" || password.trim() === "") {
       return toast("Username and password required");
     }
-    const res = await registerUser(username, password);
+    let userData = username + password;
+    const res = await createUser(userData);
+    console.log("userData :>> ", userData);
     if (res) {
       toast("You have registered successfully !");
       window.history.replaceState({}, "", "/home");

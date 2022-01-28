@@ -33,12 +33,11 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 import { useEffect, useState } from "react";
-import { getCurrentUser } from "./firebaseConfig";
+import { getCurrentUser, userAvailabilityStatus } from "./firebaseConfig";
 import { useDispatch } from "react-redux";
 const RoutingSystem: React.FC = () => {
   return (
     <IonReactRouter>
-      {/* <IonTabs> */}
       <IonSplitPane contentId="main">
         <Menu />
         <IonRouterOutlet id="main">
@@ -49,18 +48,6 @@ const RoutingSystem: React.FC = () => {
           <Route path="/profile" component={Profile} />
         </IonRouterOutlet>
       </IonSplitPane>
-
-      {/* <IonTabBar slot="bottom">
-          <IonTabButton tab="tab1" href="/tab1">
-            <IonIcon icon={triangle} />
-            <IonLabel>Tab 1</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab2" href="/register-dog">
-            <IonIcon icon={ellipse} />
-            <IonLabel>Tab 2</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>*/}
     </IonReactRouter>
   );
 };
@@ -69,9 +56,10 @@ const App: React.FC = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     getCurrentUser().then((user: any) => {
-      console.log("user", user);
+      userAvailabilityStatus();
       if (user) {
-        dispatch(setUserState(user.email));
+        console.log("USER FROM APP", user);
+        dispatch(setUserState(user));
       } else {
         window.history.replaceState({}, "", "/login");
       }

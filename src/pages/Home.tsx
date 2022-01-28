@@ -20,6 +20,9 @@ import { useState } from "react";
 const Home: React.FC = () => {
   const [busy, setBusy] = useState(false);
   const username = useSelector((state: any) => state.user.username);
+  const a = useSelector((state: any) => state);
+  console.log("a :>> ", a);
+
   const history = useHistory();
   async function logout() {
     setBusy(true);

@@ -28,8 +28,19 @@ import {
   imageOutline,
   personAddOutline,
 } from "ionicons/icons";
+import { useSelector } from "react-redux";
+import { useState } from "react";
 
 const Profile = () => {
+  const [toggle, setToggle] = useState(false);
+
+  const username = useSelector((state: any) => state.user.username);
+  console.log("toggle :>> ", toggle);
+  let isAvailable = useSelector((state: any) => state);
+  console.log("isAvailable :>> ", isAvailable);
+  const updateFirebase = () => {
+    isAvailable = toggle;
+  };
   return (
     <IonPage className="home">
       <IonHeader>
@@ -71,25 +82,27 @@ const Profile = () => {
                       <IonRow className="profileInfo">
                         <IonCol size="12">
                           <IonText color="dark" className="profileName">
-                            <p>Alan Montgomery</p>
+                            <p>{username}</p>
                           </IonText>
                           {/* ICI */}
-                          <IonToggle>Available</IonToggle>
-                          <IonText color="medium">
-                            <p>Mobile Team Lead</p>
-                          </IonText>
+                          <IonToggle
+                            checked={toggle}
+                            onIonChange={(e) => setToggle(e.detail.checked)}
+                          >
+                            Available
+                          </IonToggle>
                         </IonCol>
                       </IonRow>
 
                       <IonRow className="profileStats">
                         <IonCol className="profileStat">
                           <IonCardTitle>109</IonCardTitle>
-                          <IonCardSubtitle>Followinig</IonCardSubtitle>
+                          <IonCardSubtitle>Chiens promenés</IonCardSubtitle>
                         </IonCol>
 
                         <IonCol className="profileStat">
                           <IonCardTitle>1.2k</IonCardTitle>
-                          <IonCardSubtitle>Followers</IonCardSubtitle>
+                          <IonCardSubtitle>Chiens</IonCardSubtitle>
                         </IonCol>
                       </IonRow>
                     </IonCol>
@@ -103,9 +116,13 @@ const Profile = () => {
                     </IonCol>
 
                     <IonCol size="6">
-                      <IonButton color="primary" expand="block">
+                      <IonButton
+                        onClick={updateFirebase}
+                        color="primary"
+                        expand="block"
+                      >
                         <IonIcon icon={personAddOutline} size="small" />
-                        &nbsp; Follow
+                        &nbsp; Save
                       </IonButton>
                     </IonCol>
                   </IonRow>

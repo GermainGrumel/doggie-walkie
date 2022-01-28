@@ -10,7 +10,8 @@ export default function reducer(
             return {
                 ...state,
                 user: {
-                    username : payload.split('@')[0]
+                    username: payload?.email?.split('@')[0],
+                    payload : payload.isAvailable
                 }
             }
     }

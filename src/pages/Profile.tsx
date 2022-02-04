@@ -28,19 +28,24 @@ import {
   imageOutline,
   personAddOutline,
 } from "ionicons/icons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
+import { setUserState } from "../redux/actions";
+import { getCurrentUser } from "../firebaseConfig";
 
 const Profile = () => {
   const [toggle, setToggle] = useState(false);
-
+  const dispatch = useDispatch();
   const username = useSelector((state: any) => state.user.username);
-  console.log("toggle :>> ", toggle);
-  let isAvailable = useSelector((state: any) => state);
-  console.log("isAvailable :>> ", isAvailable);
+  let state = useSelector((state: any) => state);
+  console.log("state :>> ", state);
   const updateFirebase = () => {
-    isAvailable = toggle;
+    getCurrentUser().then((user: any) => {
+      user.isAvailable = toggle;
+      dispatch(setUserState(user.isAvailable));
+    });
   };
+
   return (
     <IonPage className="home">
       <IonHeader>

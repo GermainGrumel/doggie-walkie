@@ -1,5 +1,7 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
+import { useDispatch } from 'react-redux';
+import { setUserState } from './redux/actions';
 import { toast } from './toast';
 
 // https://stackoverflow.com/questions/69139443/property-auth-does-not-exist-on-type-typeof-import-firebase-auth
@@ -26,6 +28,7 @@ export function getCurrentUser() {
     const unsubscribe = firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
             resolve(user)
+            console.log('user', user);
         } else {
             resolve(null)
             }
@@ -66,36 +69,15 @@ export async function loginUser(username: string, password: string) {
 //     }
 // }
 
-export async function createUser(userData: any) {
-    try {
-      const userCredential = await firebase
-        .auth()
-        .createUserWithEmailAndPassword(
-          userData.get('userName'),
-          userData.get('password')
-        );
-            const userId = userCredential.user?.uid;
-            console.log('userId', userId);
-      await firebase
-        .database()
-        .ref('users/' + userId + '/')
-        .set({
-          fullName: userData.get('fullName'),
-          phoneNumber: userData.get('phoneNumber')
-        });
 
-      return userId;  //As per your comment below
-
-    } catch (error) {
-      return error;
-    }
-  };
 
 export function userAvailabilityStatus() {
     return new Promise((resolve, reject)=>{
-    firebase.auth().onAuthStateChanged(function (user : any) {
+        firebase.auth().onAuthStateChanged(function (user: any) {
+        let dispatch = useDispatch()
         if (user) {
             user["isAvailable"] = false;
+            dispatch(setUserState(user.isAvailable));
             console.log('CLAC', user);
             resolve(user)
         } else {

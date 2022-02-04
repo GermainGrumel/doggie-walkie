@@ -11,7 +11,7 @@ export default function reducer(
                 ...state,
                 user: {
                     username: payload?.email?.split('@')[0],
-                    payload : payload.isAvailable
+                    isAvailable : payload.isAvailable
                 }
             }
     }

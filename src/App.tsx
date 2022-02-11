@@ -1,77 +1,101 @@
-import { Route } from "react-router-dom";
-import { setUserState } from "./redux/actions";
+import { useState } from "react";
 import {
-  IonApp,
-  IonRouterOutlet,
-  IonSpinner,
-  IonSplitPane,
-} from "@ionic/react";
-import { IonReactRouter } from "@ionic/react-router";
-import Home from "./pages/Home";
-import Login from "./pages/Registration/Login";
-import RegisterDog from "./pages/Registration/RegisterDog";
-import RegisterUser from "./pages/Registration/RegisterUser";
-import Profile from "./pages/Profile";
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
+import "./App.css";
+import { auth } from "./firebaseConfig";
+import { IonButton, IonContent, IonInput, IonRow, IonTitle } from "@ionic/react";
 
-import Menu from "./components/Menu";
-/* Core CSS required for Ionic components to work properly */
-import "@ionic/react/css/core.css";
+function App() {
+  const [registerEmail, setRegisterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
 
-/* Basic CSS for apps built with Ionic */
-import "@ionic/react/css/normalize.css";
-import "@ionic/react/css/structure.css";
-import "@ionic/react/css/typography.css";
+  const [user, setUser] = useState({});
 
-/* Optional CSS utils that can be commented out */
-import "@ionic/react/css/padding.css";
-import "@ionic/react/css/float-elements.css";
-import "@ionic/react/css/text-alignment.css";
-import "@ionic/react/css/text-transformation.css";
-import "@ionic/react/css/flex-utils.css";
-import "@ionic/react/css/display.css";
+  onAuthStateChanged(auth, (currentUser:any) => {
+    setUser(currentUser);
+  });
 
-/* Theme variables */
-import "./theme/variables.css";
-import { useEffect, useState } from "react";
-import { getCurrentUser, userAvailabilityStatus } from "./firebaseConfig";
-import { useDispatch } from "react-redux";
-const RoutingSystem: React.FC = () => {
-  return (
-    <IonReactRouter>
-      <IonSplitPane contentId="main">
-        <Menu />
-        <IonRouterOutlet id="main">
-          <Route path="/" component={Home} />
-          <Route path="/register-dog" component={RegisterDog} />
-          <Route path="/login" component={Login} />
-          <Route path="/register-user" component={RegisterUser} />
-          <Route path="/profile" component={Profile} />
-        </IonRouterOutlet>
-      </IonSplitPane>
-    </IonReactRouter>
-  );
-};
-const App: React.FC = () => {
-  const [busy, setBusy] = useState(true);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    getCurrentUser().then((user: any) => {
-      userAvailabilityStatus();
-      if (user) {
-        console.log("USER FROM APP", user);
-        dispatch(setUserState(user));
-      } else {
-        window.history.replaceState({}, "", "/login");
+  const register = async () => {
+    try {
+      const user = await createUserWithEmailAndPassword(
+        auth,
+        registerEmail,
+        registerPassword
+      );
+      console.log(user);
+    } catch (error) {
+      let errorMessage = "Failed to do something exceptional";
+      if (error instanceof Error) {
+        errorMessage = error.message;
       }
-      setBusy(false);
-    });
-  }, []);
+      console.log(errorMessage);
+    }
+  };
 
-  return <IonApp>{busy ? <IonSpinner /> : <RoutingSystem />}</IonApp>;
-  // return (
-  //   <IonApp>
-  //     <RoutingSystem />
-  //   </IonApp>
-  // );
-};
+  const login = async () => {
+    try {
+      const user = await signInWithEmailAndPassword(
+        auth,
+        loginEmail,
+        loginPassword
+      );
+      console.log(user);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const logout = async () => {
+    await signOut(auth);
+  };
+
+  return (
+    <IonContent className="App">
+      <IonRow>
+          <IonTitle> Register User </IonTitle>
+          <IonInput
+            placeholder="Email..."
+            onChange={(event:any) => {
+              setRegisterEmail(event.target.value);
+            }}
+          />
+          <IonInput
+            placeholder="Password..."
+            onChange={(event:any) => {
+              setRegisterPassword(event.target.value);
+            }}
+          />
+        <IonButton onClick={register}> Create User</IonButton>
+      </IonRow>
+    <IonContent className="App">
+      <IonRow>
+          <IonTitle> Login </IonTitle>
+          <IonInput
+            placeholder="Email..."
+            onChange={(event:any) => {
+              setRegisterEmail(event.target.value);
+            }}
+          />
+          <IonInput
+            placeholder="Password..."
+            onChange={(event:any) => {
+              setLoginPassword(event.target.value);
+            }}
+          />
+        <IonButton onClick={login}> Create User</IonButton>
+      </IonRow>
+
+      <IonTitle> User Logged In: </IonTitle>
+      {user?.email}
+        <IonButton onClick={logout}> Sign Out </IonButton>
+        </IonContent>
+  );
+}
+
 export default App;

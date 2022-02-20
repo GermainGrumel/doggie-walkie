@@ -1,5 +1,7 @@
 {
-  "name": "ionic-app-base",
-  "integrations": {},
+  "name": "Dog Walker",
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "react"
 }

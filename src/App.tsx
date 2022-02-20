@@ -1,101 +1,53 @@
-import { useState } from "react";
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,
-} from "firebase/auth";
-import "./App.css";
-import { auth } from "./firebaseConfig";
-import { IonButton, IonContent, IonInput, IonRow, IonTitle } from "@ionic/react";
+  IonApp,
+  IonRouterOutlet,
+  IonSplitPane,
+  setupIonicReact,
+} from "@ionic/react";
+import { IonReactRouter } from "@ionic/react-router";
+import { Redirect, Route } from "react-router-dom";
+import Menu from "./components/Menu";
+import Page from "./pages/Page";
 
-function App() {
-  const [registerEmail, setRegisterEmail] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
+/* Core CSS required for Ionic components to work properly */
+import "@ionic/react/css/core.css";
 
-  const [user, setUser] = useState({});
+/* Basic CSS for apps built with Ionic */
+import "@ionic/react/css/normalize.css";
+import "@ionic/react/css/structure.css";
+import "@ionic/react/css/typography.css";
 
-  onAuthStateChanged(auth, (currentUser:any) => {
-    setUser(currentUser);
-  });
+/* Optional CSS utils that can be commented out */
+import "@ionic/react/css/padding.css";
+import "@ionic/react/css/float-elements.css";
+import "@ionic/react/css/text-alignment.css";
+import "@ionic/react/css/text-transformation.css";
+import "@ionic/react/css/flex-utils.css";
+import "@ionic/react/css/display.css";
 
-  const register = async () => {
-    try {
-      const user = await createUserWithEmailAndPassword(
-        auth,
-        registerEmail,
-        registerPassword
-      );
-      console.log(user);
-    } catch (error) {
-      let errorMessage = "Failed to do something exceptional";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      console.log(errorMessage);
-    }
-  };
+/* Theme variables */
+import "./theme/variables.css";
 
-  const login = async () => {
-    try {
-      const user = await signInWithEmailAndPassword(
-        auth,
-        loginEmail,
-        loginPassword
-      );
-      console.log(user);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+setupIonicReact();
 
-  const logout = async () => {
-    await signOut(auth);
-  };
-
+const App: React.FC = () => {
   return (
-    <IonContent className="App">
-      <IonRow>
-          <IonTitle> Register User </IonTitle>
-          <IonInput
-            placeholder="Email..."
-            onChange={(event:any) => {
-              setRegisterEmail(event.target.value);
-            }}
-          />
-          <IonInput
-            placeholder="Password..."
-            onChange={(event:any) => {
-              setRegisterPassword(event.target.value);
-            }}
-          />
-        <IonButton onClick={register}> Create User</IonButton>
-      </IonRow>
-    <IonContent className="App">
-      <IonRow>
-          <IonTitle> Login </IonTitle>
-          <IonInput
-            placeholder="Email..."
-            onChange={(event:any) => {
-              setRegisterEmail(event.target.value);
-            }}
-          />
-          <IonInput
-            placeholder="Password..."
-            onChange={(event:any) => {
-              setLoginPassword(event.target.value);
-            }}
-          />
-        <IonButton onClick={login}> Create User</IonButton>
-      </IonRow>
-
-      <IonTitle> User Logged In: </IonTitle>
-      {user?.email}
-        <IonButton onClick={logout}> Sign Out </IonButton>
-        </IonContent>
+    <IonApp>
+      <IonReactRouter>
+        <IonSplitPane contentId="main">
+          <Menu />
+          <IonRouterOutlet id="main">
+            <Route path="/" exact={true}>
+              <Redirect to="/page/Inbox" />
+            </Route>
+            <Route path="/page/:name" exact={true}>
+              <Page />
+            </Route>
+          </IonRouterOutlet>
+        </IonSplitPane>
+      </IonReactRouter>
+    </IonApp>
   );
-}
+};
 
 export default App;

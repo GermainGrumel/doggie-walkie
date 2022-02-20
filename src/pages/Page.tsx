@@ -49,6 +49,7 @@ import "./Page.css";
 import shortid from "shortid";
 // different page views
 import Account from "./Account";
+import Login from "./Login";
 
 const Page: React.FC = () => {
   const { name } = useParams<{ name: string }>();
@@ -61,6 +62,8 @@ const Page: React.FC = () => {
     switch (name) {
       case "Account":
         return <Account key={shortid.generate()}></Account>;
+      case "Login":
+        return <Login key={shortid.generate()}></Login>;
       default:
     }
   };
@@ -72,6 +75,8 @@ const Page: React.FC = () => {
     switch (name) {
       case "Account":
         return "Compte";
+      case "Login":
+        return "Connexion";
       default:
         return name;
     }

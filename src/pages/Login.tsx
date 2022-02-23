@@ -22,7 +22,6 @@ import {
 } from "ionicons/icons";
 
 import React, { useState } from "react";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
 
@@ -138,21 +137,21 @@ const Page: React.FC = () => {
       const username: any = email;
       const password: any = pass;
       // eslint-disable-next-line
-      // const { user } = await auth.signUp({
-      //   username,
-      //   password,
-      //   attributes: {
-      //     email: email, // optional
-      //     phone_number: phoneNum, // optional - E.164 number convention
-      //     name: name,
-      //     family_name: familyName,
-      //     gender: gender,
-      //   },
-      // });
-      // await auth.signIn({
-      //   username,
-      //   password,
-      // });
+      const { user } = await auth.signUp({
+        username,
+        password,
+        attributes: {
+          email: email, // optional
+          phone_number: phoneNum, // optional - E.164 number convention
+          name: name,
+          family_name: familyName,
+          gender: gender,
+        },
+      });
+      await auth.signIn({
+        username,
+        password,
+      });
       window.location.href = "/";
     } catch (error) {
       setColor("danger");

@@ -1,6 +1,10 @@
 import firebase from "firebase/compat/app";
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+} from "firebase/auth";
 export const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -17,14 +21,13 @@ const auth = getAuth();
 export function getCurrentUser() {
   return new Promise((resolve, reject) => {
     // firebase.
-    const unsubscribe = firebase.auth().onAuthStateChanged(function (user) {
+    onAuthStateChanged(auth, (user) => {
       if (user) {
         resolve(user);
         console.log("user", user);
       } else {
-        resolve(null);
+        reject(user);
       }
-      unsubscribe();
     });
   });
 }

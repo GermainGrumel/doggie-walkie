@@ -20,6 +20,7 @@ import shortid from "shortid";
 import Account from "./Account";
 import Login from "./Login";
 import SignUp from "./SignUp";
+import HomePage from "./HomePage";
 
 const Page: React.FC = () => {
   const { name } = useParams<{ name: string }>();
@@ -33,6 +34,8 @@ const Page: React.FC = () => {
         return <Login key={shortid.generate()}></Login>;
       case "SignUp":
         return <SignUp key={shortid.generate()}></SignUp>;
+      case "HomePage":
+        return <HomePage key={shortid.generate()}></HomePage>;
       default:
     }
   };
@@ -48,6 +51,8 @@ const Page: React.FC = () => {
         return "Connexion";
       case "SignUp":
         return "Inscription";
+      case "HomePage":
+        return "Accueil";
       default:
         return name;
     }

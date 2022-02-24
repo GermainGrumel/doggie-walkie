@@ -18,17 +18,14 @@ initializeApp(firebaseConfig);
 
 const auth = getAuth();
 
-export function getCurrentUser() {
-  return new Promise((resolve, reject) => {
-    // firebase.
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        resolve(user);
-        console.log("user", user);
-      } else {
-        reject(user);
-      }
-    });
+export async function getCurrentUser() {
+  await onAuthStateChanged(auth, (user) => {
+    const uid = user?.uid;
+    const username = user?.displayName;
+    const email = user?.email;
+    const phoneNumber = user?.phoneNumber;
+    console.log("user", user);
+    return user;
   });
 }
 // export async function logoutUser() {

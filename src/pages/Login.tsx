@@ -40,9 +40,9 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "../theme/variables.css";
-import { auth } from "../config/firebase";
+import * as auth from "firebase/auth";
 
-const Page: React.FC = () => {
+const Login: React.FC = () => {
   const [pass, setPass] = useState<string>("");
   const [passConfirm, setPassConfirm] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -53,15 +53,26 @@ const Page: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const [color, setColor] = useState<string>("");
   const [showToast, setShowToast] = useState(false);
-  const [showConnexion, setShowConnexion] = React.useState(false);
-  const [showInscription, setShowInscription] = React.useState(false);
+  const [showConnexion, setShowConnexion] = React.useState(true);
+  const [showInscription, setShowInscription] = React.useState(true);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = React.useState(false);
 
   /* ON ENLEVE LA PREMIERE LETTRE DU TELEPHONE POUR EVITER DES +3306  */
 
   const phoneNum: string = "+33" + phoneNumber.substring(1);
+  let payload = {
+    gender,
+    name,
+    familyName,
+    pass,
+    email,
+    phoneNum,
+  };
 
+  console.log("payload", payload);
+  console.log("showConnexion", showConnexion);
+  console.log("showInscription", showInscription);
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -88,6 +99,10 @@ const Page: React.FC = () => {
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
       email
     );
+
+  function handleSubmit(event: any) {
+    signUp();
+  }
 
   async function signUp() {
     try {
@@ -136,22 +151,6 @@ const Page: React.FC = () => {
       }
       const username: any = email;
       const password: any = pass;
-      // eslint-disable-next-line
-      const { user } = await auth.signUp({
-        username,
-        password,
-        attributes: {
-          email: email, // optional
-          phone_number: phoneNum, // optional - E.164 number convention
-          name: name,
-          family_name: familyName,
-          gender: gender,
-        },
-      });
-      await auth.signIn({
-        username,
-        password,
-      });
       window.location.href = "/";
     } catch (error) {
       setColor("danger");
@@ -500,7 +499,7 @@ const Page: React.FC = () => {
             <div className="ion-padding-vertical"></div>
             <IonButton
               expand="full"
-              // onClick={(e) => handleSubmit(e)}
+              onClick={(e) => handleSubmit(e)}
               color="primary"
             >
               Inscription
@@ -517,4 +516,4 @@ const Page: React.FC = () => {
   );
 };
 
-export default Page;
+export default Login;

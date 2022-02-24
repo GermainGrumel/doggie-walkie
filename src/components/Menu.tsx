@@ -55,14 +55,14 @@ const appPages: AppPage[] = [
     mdIcon: heartSharp,
   },
   {
-    title: "Archived",
-    url: "/page/Archived",
+    title: "Login",
+    url: "/page/Login",
     iosIcon: archiveOutline,
     mdIcon: archiveSharp,
   },
   {
     title: "Trash",
-    url: "/page/Trash",
+    url: "/page/SignUp",
     iosIcon: trashOutline,
     mdIcon: trashSharp,
   },

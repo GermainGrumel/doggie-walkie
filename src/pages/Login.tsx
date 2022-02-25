@@ -22,6 +22,8 @@ import {
 } from "ionicons/icons";
 
 import React, { useState } from "react";
+import { useStore } from "react-redux";
+
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
 
@@ -40,8 +42,9 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "../theme/variables.css";
-import * as auth from "firebase/auth";
 
+// Firebase REALTIME DATABASE
+import { getDatabase, ref, set } from "firebase/database";
 const Login: React.FC = () => {
   const [pass, setPass] = useState<string>("");
   const [passConfirm, setPassConfirm] = useState<string>("");
@@ -58,21 +61,24 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = React.useState(false);
 
+  const state = useStore().getState();
+  console.log(state.uid);
+
   /* ON ENLEVE LA PREMIERE LETTRE DU TELEPHONE POUR EVITER DES +3306  */
 
   const phoneNum: string = "+33" + phoneNumber.substring(1);
-  let payload = {
-    gender,
-    name,
-    familyName,
-    pass,
-    email,
-    phoneNum,
+
+  const writeUserData = () => {
+    const db = getDatabase();
+    set(ref(db, "users/" + state.uid), {
+      username: name + " " + familyName,
+      gender: gender,
+      password: pass,
+      email: email,
+      phoneNumber: phoneNum,
+    });
   };
 
-  console.log("payload", payload);
-  console.log("showConnexion", showConnexion);
-  console.log("showInscription", showInscription);
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -149,8 +155,6 @@ const Login: React.FC = () => {
         setShowToast(true);
         return;
       }
-      const username: any = email;
-      const password: any = pass;
       window.location.href = "/";
     } catch (error) {
       setColor("danger");
@@ -497,11 +501,7 @@ const Login: React.FC = () => {
 
             {/* SUBMIT */}
             <div className="ion-padding-vertical"></div>
-            <IonButton
-              expand="full"
-              onClick={(e) => handleSubmit(e)}
-              color="primary"
-            >
+            <IonButton expand="full" onClick={writeUserData} color="primary">
               Inscription
             </IonButton>
             <div className="ion-margin-top ion-text-center">

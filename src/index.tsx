@@ -6,30 +6,35 @@ import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
 import { getCurrentUser } from "./config/firebase";
-const user = getCurrentUser();
-console.log("USER :>> ", user);
-const setUser = (state = {}, action: any) => {
-  state = action.user;
-  return state;
-};
+import Login from "./pages/Login";
+const userData = getCurrentUser().then((user) => {
+  if (user) {
+    console.log("user :>> ", user);
+    const setUser = (state = {}, action: any) => {
+      state = action.user;
+      return state;
+    };
+    const store = createStore(setUser);
+    const setData = (userData: any) => ({
+      type: "SET_USER",
+      id: 0,
+      user: userData, // défini plus haut
+    });
 
-const store = createStore(setUser);
-const setData = (userData: any) => ({
-  type: "SET_USER",
-  id: 0,
-  user: userData, // défini plus haut
+    // Redux affiche user
+    store.dispatch(setData(user));
+    console.log(store.dispatch(setData(user)));
+    ReactDOM.render(
+      <Provider store={store}>
+        <App />
+      </Provider>,
+      document.getElementById("root")
+    );
+  } else {
+    console.log("userData :>> ", userData);
+    ReactDOM.render(<Login />, document.getElementById("root"));
+  }
 });
-
-// Redux affiche user
-store.dispatch(setData(user));
-console.log(store.dispatch(setData(user)));
-
-ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.getElementById("root")
-);
 
 // ReactDOM.render(
 //   <React.StrictMode>

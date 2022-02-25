@@ -45,6 +45,9 @@ import "../theme/variables.css";
 
 // Firebase REALTIME DATABASE
 import { getDatabase, ref, set } from "firebase/database";
+
+// CUSTOM STYLES
+import "../styles/Login.scss";
 const Login: React.FC = () => {
   const [pass, setPass] = useState<string>("");
   const [passConfirm, setPassConfirm] = useState<string>("");
@@ -62,10 +65,8 @@ const Login: React.FC = () => {
   const [showPasswordConfirm, setShowPasswordConfirm] = React.useState(false);
 
   const state = useStore().getState();
-  console.log(state.uid);
 
   /* ON ENLEVE LA PREMIERE LETTRE DU TELEPHONE POUR EVITER DES +3306  */
-
   const phoneNum: string = "+33" + phoneNumber.substring(1);
 
   const writeUserData = () => {
@@ -168,7 +169,7 @@ const Login: React.FC = () => {
   return (
     <div className="page-login ion-padding-top">
       <div className="ion-text-center">
-        <IonImg className="logo" src="assets/tmp/logo.svg" />
+        <IonImg className="logo" src="assets/icon/logo.png" />
         <IonText className="slogan text-md" color="dark">
           Votre partenaire E-learning
         </IonText>

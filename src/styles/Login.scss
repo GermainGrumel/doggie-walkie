@@ -1,0 +1,78 @@
+.alert-wrapper {
+  width: 100% !important;
+  max-width: 400px !important;
+}
+
+// body {
+//   background-color: #fff;
+//   color: #838f97;
+//   height: fit-content;
+// }
+.page-login {
+  & .logo {
+    margin: auto;
+    margin-top: 20px;
+    max-width: 115px;
+  }
+
+  & .slogan {
+    display: block;
+    margin-top: 15px;
+    font-size: 16px;
+  }
+
+  & ion-button {
+    margin-top: 50px;
+    height: 50px;
+    font-size: 14px;
+  }
+}
+
+#sign-up {
+  max-width: 500px;
+  margin: auto;
+
+  & .block-register {
+    margin-bottom: var(--margin-bottom);
+    padding: var(--padding);
+    padding-top: 0;
+    border-radius: var(--border-radius);
+
+    // box-shadow: var(--box-shadow);
+    & .register-mandatory {
+      padding: 25px 0;
+    }
+
+    & ion-item {
+      margin-bottom: 15px;
+      // --padding-start: 0;
+      // --inner-padding-end: 0;
+      border: 0.5px solid var(--ion-color-primary);
+      border-radius: 10px;
+
+
+      & .register-password {
+        font-size: 13px;
+      }
+    }
+
+    & ion-button {
+      border-radius: 4px;
+      box-shadow: initial;
+      min-height: 49px;
+      margin: auto;
+    }
+
+    & ion-label {
+      font-size: 18px !important;
+    }
+
+    .bolder-label {
+      font-weight: bolder;
+    }
+
+    & .password-checkbox-text {
+      padding-left: 10px;
+    }
+  }
+}

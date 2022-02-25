@@ -1,0 +1,69 @@
+.alert-wrapper {
+  width: 100% !important;
+  max-width: 400px !important;
+}
+
+.page-login .logo {
+  margin: auto;
+  margin-top: 20px;
+  max-width: 115px;
+}
+
+.page-login .slogan {
+  display: block;
+  margin-top: 15px;
+  font-size: 16px;
+}
+
+.page-login ion-button {
+  margin-top: 50px;
+  height: 50px;
+  font-size: 14px;
+}
+
+#sign-up {
+  max-width: 500px;
+  margin: auto;
+}
+
+#sign-up .block-register {
+  margin-bottom: var(--margin-bottom);
+  padding: var(--padding);
+  padding-top: 0;
+  border-radius: var(--border-radius);
+}
+
+#sign-up .block-register .register-mandatory {
+  padding: 25px 0;
+}
+
+#sign-up .block-register ion-item {
+  margin-bottom: 15px;
+  border: 0.5px solid var(--ion-color-primary);
+  border-radius: 10px;
+}
+
+#sign-up .block-register ion-item .register-password {
+  font-size: 13px;
+}
+
+#sign-up .block-register ion-button {
+  border-radius: 4px;
+  -webkit-box-shadow: initial;
+          box-shadow: initial;
+  min-height: 49px;
+  margin: auto;
+}
+
+#sign-up .block-register ion-label {
+  font-size: 18px !important;
+}
+
+#sign-up .block-register .bolder-label {
+  font-weight: bolder;
+}
+
+#sign-up .block-register .password-checkbox-text {
+  padding-left: 10px;
+}
+/*# sourceMappingURL=Login.css.map */

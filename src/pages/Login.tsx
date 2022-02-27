@@ -45,7 +45,7 @@ import "@ionic/react/css/display.css";
 import "../theme/variables.css";
 
 // Firebase REALTIME DATABASE
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, set, child, get } from "firebase/database";
 import { registerUser } from "../config/firebase";
 
 // CUSTOM STYLES
@@ -72,6 +72,7 @@ const Login: React.FC = () => {
   const [showInscription, setShowInscription] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = React.useState(false);
+  const [data, setData] = React.useState(false);
 
   const history = useHistory();
   const state = useStore().getState();
@@ -101,18 +102,22 @@ const Login: React.FC = () => {
   const phoneNum: string = "+33" + phoneNumber.substring(1);
 
   const writeUserData = () => {
-    const db = getDatabase();
-    try {
-      set(ref(db, "users/" + name + familyName), {
-        username: name + " " + familyName,
-        gender: gender,
-        password: pass,
-        email: email,
-        phoneNumber: phoneNum,
-      });
-      history.push("/page/HomePage");
-    } catch (e) {
-      console.log("ERROR FROM SIGN UP", e);
+    signUpRules();
+    console.log("data :>> ", data);
+    if (data) {
+      const db = getDatabase();
+      try {
+        set(ref(db, "users/" + name + familyName), {
+          username: name + " " + familyName,
+          gender: gender,
+          password: pass,
+          email: email,
+          phoneNumber: phoneNum,
+        });
+        history.push("/page/HomePage");
+      } catch (e) {
+        console.log("ERROR FROM SIGN UP", e);
+      }
     }
   };
 
@@ -143,7 +148,7 @@ const Login: React.FC = () => {
       email
     );
 
-  async function signUp() {
+  async function signUpRules() {
     try {
       setShowToast(false);
       if (
@@ -188,7 +193,7 @@ const Login: React.FC = () => {
         setShowToast(true);
         return;
       }
-      window.location.href = "/";
+      //  window.location.href = "/Page/HomePage";
     } catch (error) {
       setColor("danger");
       setMessage(
@@ -197,6 +202,7 @@ const Login: React.FC = () => {
       setShowToast(true);
       return;
     }
+    return setData(true);
   }
   return (
     <IonContent>

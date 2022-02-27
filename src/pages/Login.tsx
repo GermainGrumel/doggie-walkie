@@ -44,7 +44,16 @@ import "@ionic/react/css/display.css";
 import "../theme/variables.css";
 
 // Firebase REALTIME DATABASE
-import { getDatabase, ref, set, child, get, push } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  set,
+  child,
+  get,
+  push,
+  query,
+  orderByChild,
+} from "firebase/database";
 import { registerUser } from "../config/firebase";
 
 // CUSTOM STYLES
@@ -76,6 +85,13 @@ const Login: React.FC = () => {
   const history = useHistory();
   const db = getDatabase();
   const dbRef = ref(db);
+  const newUserUid = push(child(ref(db), "users")).key;
+  // https://firebase.google.com/docs/database/web/lists-of-data
+  // const topUserPostsRef = query(
+  //   ref(db, "users/" + newUserUid),
+  //   orderByChild("name")
+  // );
+  // console.log("topUserPostsRef", topUserPostsRef);
 
   const readUserData = () => {
     get(child(dbRef, `users/${name + familyName}`))
@@ -92,7 +108,6 @@ const Login: React.FC = () => {
   };
   const writeUserData = () => {
     signUpRules();
-    const newUserUid = push(child(ref(db), "users")).key;
     const userData = {
       username: name + " " + familyName,
       gender: gender,
@@ -102,8 +117,9 @@ const Login: React.FC = () => {
     };
     if (data) {
       try {
-        set(ref(db, "users/" + newUserUid), userData);
-        history.push("/page/HomePage");
+        set(ref(db, "users/" + newUserUid), userData).then(() => {
+          history.push("/page/HomePage");
+        });
       } catch (e) {
         console.log("ERROR FROM SIGN UP", e);
       }

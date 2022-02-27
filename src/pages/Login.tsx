@@ -13,6 +13,7 @@ import {
   IonRow,
   IonIcon,
   IonCol,
+  IonContent,
 } from "@ionic/react";
 import {
   closeCircleOutline,
@@ -45,10 +46,15 @@ import "../theme/variables.css";
 
 // Firebase REALTIME DATABASE
 import { getDatabase, ref, set } from "firebase/database";
+import { registerUser } from "../config/firebase";
 
 // CUSTOM STYLES
 import "../styles/Login.scss";
 const Login: React.FC = () => {
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [cpassword, setCPassword] = useState<string>("");
+
   const [pass, setPass] = useState<string>("");
   const [passConfirm, setPassConfirm] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -60,11 +66,33 @@ const Login: React.FC = () => {
   const [color, setColor] = useState<string>("");
   const [showToast, setShowToast] = useState(false);
   const [showConnexion, setShowConnexion] = React.useState(true);
-  const [showInscription, setShowInscription] = React.useState(true);
+  const [showInscription, setShowInscription] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = React.useState(false);
 
   const state = useStore().getState();
+  console.log(showConnexion);
+
+  async function register() {
+    if (password !== cpassword) {
+      setColor("danger");
+      setMessage("Les mots de passe ne correspondent pas");
+      setShowToast(true);
+    }
+    if (username.trim() === "" || password.trim() === "") {
+      setColor("danger");
+      setMessage("Le mot de passe ne peut pas être vide");
+      setShowToast(true);
+    }
+    const res = await registerUser(username, password);
+    console.log("res :>> ", res);
+    if (res) {
+      setColor("danger");
+      setMessage(`Bienvenue ${username}`);
+      setShowToast(true);
+      window.history.replaceState({}, "", "/home");
+    }
+  }
 
   /* ON ENLEVE LA PREMIERE LETTRE DU TELEPHONE POUR EVITER DES +3306  */
   const phoneNum: string = "+33" + phoneNumber.substring(1);
@@ -106,10 +134,6 @@ const Login: React.FC = () => {
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
       email
     );
-
-  function handleSubmit(event: any) {
-    signUp();
-  }
 
   async function signUp() {
     try {
@@ -167,353 +191,395 @@ const Login: React.FC = () => {
     }
   }
   return (
-    <div className="page-login ion-padding-top">
-      <div className="ion-text-center">
-        <IonImg className="logo" src="assets/icon/logo.png" />
-        <IonText className="slogan text-md" color="dark">
-          Votre partenaire E-learning
-        </IonText>
-        <IonButton color="primary" onClick={() => handleAddClickConnexion()}>
-          J'ai déjà un compte
-        </IonButton>
-        <IonButton color="primary" onClick={() => handleAddClickInscription()}>
-          Je veux m'inscrire
-        </IonButton>
-      </div>
-      <IonToast
-        isOpen={showToast}
-        onDidDismiss={() => setShowToast(false)}
-        message={message}
-        position="middle"
-        color={color}
-        duration={5000}
-        buttons={[
-          {
-            icon: "close",
-            role: "Fermer",
-            handler: () => {},
-          },
-        ]}
-      />
-      {/* CONNEXION */}
-      {/* {showConnexion === true ? (
-        <AmplifyAuthenticator>
-          <AmplifySignIn
-            hideSignUp
-            headerText="Connectez-vous"
-            submitButtonText="Connexion"
-            slot="sign-in"
-          ></AmplifySignIn>
-        </AmplifyAuthenticator>
-      ) : null} */}
-      {/* FIN CONNEXION */}
-
-      {/* INSCRIPTION */}
-
-      {showInscription === true ? (
-        <IonGrid slot="sign-up" id="sign-up">
-          <div className="block-register">
-            <div className="register-mandatory ion-text-center">
-              <IonText>Tous les champs sont obligatoires</IonText>
-            </div>
-
-            {/* GENDER */}
+    <IonContent>
+      <div className="page-login ion-padding-top">
+        <div className="ion-text-center">
+          <IonImg className="logo" src="assets/icon/logo.png" />
+          <IonText className="slogan text-md" color="dark">
+            Prenez soin de votre animal de compagnie préféré !
+          </IonText>
+          <IonButton color="primary" onClick={() => handleAddClickConnexion()}>
+            J'ai déjà un compte
+          </IonButton>
+          <IonButton
+            color="primary"
+            onClick={() => handleAddClickInscription()}
+          >
+            Je veux m'inscrire
+          </IonButton>
+        </div>
+        <IonToast
+          isOpen={showToast}
+          onDidDismiss={() => setShowToast(false)}
+          message={message}
+          position="middle"
+          color={color}
+          duration={5000}
+          buttons={[
+            {
+              icon: "close",
+              role: "Fermer",
+              handler: () => {},
+            },
+          ]}
+        />
+        {/* CONNEXION */}
+        {showConnexion ? (
+          <>
             <IonItem>
-              <IonLabel color="dark">Civilité</IonLabel>
-              <IonSelect
-                value={gender}
-                okText="OK"
-                cancelText="Fermer"
-                onIonChange={(e) => setGender(e.detail.value!)}
+              <IonLabel position="floating">Email</IonLabel>
+              <IonInput
+                required
+                placeholder="Entrez votre email"
+                onIonChange={(e) => setUsername(e.detail.value!)}
+                clearInput
+                value={username}
+              ></IonInput>
+            </IonItem>
+            <IonItem>
+              <IonLabel position="floating">Mot de passe</IonLabel>
+              <IonInput
+                type="password"
+                required
+                placeholder="Entrez un mot de passe"
+                onIonChange={(e) => setPassword(e.detail.value!)}
+                clearInput
+                value={password}
+              ></IonInput>
+            </IonItem>
+            <IonItem>
+              <IonLabel position="floating">
+                Confirmez votre mot de passe
+              </IonLabel>
+              <IonInput
+                type="password"
+                required
+                placeholder="Confirmez votre mot de passe "
+                onIonChange={(e) => setCPassword(e.detail.value!)}
+                clearInput
+                value={cpassword}
+              ></IonInput>
+            </IonItem>
+            <IonRow>
+              <IonButton
+                onClick={register}
+                className="ion-margin-top"
+                type="submit"
               >
-                <IonSelectOption value="monsieur">Monsieur</IonSelectOption>
-                <IonSelectOption value="madame">Madame</IonSelectOption>
-              </IonSelect>
-            </IonItem>
+                Créer un compte
+              </IonButton>
+            </IonRow>
+          </>
+        ) : null}
+        {/* FIN CONNEXION */}
 
-            {/* PRENOM */}
-            <IonItem>
-              <IonLabel position="floating" color="dark">
-                Prénom :
-              </IonLabel>
-              <IonInput
-                type="text"
-                value={name}
-                placeholder="Ex : Votre prénom"
-                onIonChange={(e) => setName(e.detail.value!)}
-              ></IonInput>
-            </IonItem>
+        {/* INSCRIPTION */}
 
-            {/* NOM */}
-            <IonItem>
-              <IonLabel position="floating" color="dark">
-                Nom :
-              </IonLabel>
-              <IonInput
-                type="text"
-                value={familyName}
-                placeholder="Ex : Votre nom de famille"
-                onIonChange={(e) => setFamilyName(e.detail.value!)}
-              ></IonInput>
-            </IonItem>
+        {showInscription ? (
+          <IonGrid slot="sign-up" id="sign-up">
+            <div className="block-register">
+              <div className="register-mandatory ion-text-center">
+                <IonText>Tous les champs sont obligatoires</IonText>
+              </div>
 
-            {/* EMAIL */}
+              {/* GENDER */}
+              <IonItem>
+                <IonLabel color="dark">Civilité</IonLabel>
+                <IonSelect
+                  value={gender}
+                  okText="OK"
+                  cancelText="Fermer"
+                  onIonChange={(e) => setGender(e.detail.value!)}
+                >
+                  <IonSelectOption value="monsieur">Monsieur</IonSelectOption>
+                  <IonSelectOption value="madame">Madame</IonSelectOption>
+                </IonSelect>
+              </IonItem>
 
-            {emailCheck === false ? (
+              {/* PRENOM */}
               <IonItem>
                 <IonLabel position="floating" color="dark">
-                  E-mail :
+                  Prénom :
                 </IonLabel>
                 <IonInput
-                  type="email"
-                  value={email}
-                  onIonChange={(e) => setEmail(e.detail.value!)}
-                  placeholder="Ex : monmail@gmail.com"
+                  type="text"
+                  value={name}
+                  placeholder="Ex : Votre prénom"
+                  onIonChange={(e) => setName(e.detail.value!)}
                 ></IonInput>
-                <IonIcon
-                  className="ion-justify-content-center ion-align-self-center"
-                  slot="end"
-                  size="medium"
-                  color="danger"
-                  icon={closeCircleOutline}
-                ></IonIcon>
               </IonItem>
-            ) : (
+
+              {/* NOM */}
               <IonItem>
                 <IonLabel position="floating" color="dark">
-                  E-mail :
+                  Nom :
                 </IonLabel>
                 <IonInput
-                  type="email"
-                  value={email}
-                  onIonChange={(e) => setEmail(e.detail.value!)}
-                  placeholder="Ex : monmail@gmail.com"
+                  type="text"
+                  value={familyName}
+                  placeholder="Ex : Votre nom de famille"
+                  onIonChange={(e) => setFamilyName(e.detail.value!)}
                 ></IonInput>
-                <IonIcon
-                  className="ion-justify-content-center ion-align-self-center"
-                  slot="end"
-                  color="success"
-                  icon={checkmarkCircleOutline}
-                  size="medium"
-                ></IonIcon>
               </IonItem>
-            )}
 
-            {/* TELEPHONE */}
+              {/* EMAIL */}
 
-            {phoneNumber.length !== 10 || !phoneNumber.match(/^-?\d+$/) ? (
-              <IonItem>
-                <IonLabel position="floating" color="dark">
-                  N° tel mobile : (10 chiffres.)
-                </IonLabel>
-                <IonInput
-                  type="tel"
-                  value={phoneNumber}
-                  onIonChange={(e) => setPhoneNumber(e.detail.value!)}
-                  placeholder="Ex : 0612345678"
-                ></IonInput>
-                <IonIcon
-                  className="ion-justify-content-center ion-align-self-center"
-                  slot="end"
-                  size="medium"
-                  color="danger"
-                  icon={closeCircleOutline}
-                ></IonIcon>
-              </IonItem>
-            ) : (
-              <IonItem>
-                <IonLabel position="floating" color="dark">
-                  N° tel mobile : (10 chiffres)
-                </IonLabel>
-                <IonInput
-                  type="tel"
-                  value={phoneNumber}
-                  onIonChange={(e) => setPhoneNumber(e.detail.value!)}
-                  placeholder="Ex : 0612345678"
-                ></IonInput>
-                <IonIcon
-                  className="ion-justify-content-center ion-align-self-center"
-                  slot="end"
-                  color="success"
-                  icon={checkmarkCircleOutline}
-                  size="medium"
-                ></IonIcon>
-              </IonItem>
-            )}
-
-            {/* PASSWORD */}
-            {pass.length < 8 || pass.toLowerCase() === pass ? (
-              <IonRow>
-                <IonCol size="1">
+              {emailCheck === false ? (
+                <IonItem>
+                  <IonLabel position="floating" color="dark">
+                    E-mail :
+                  </IonLabel>
+                  <IonInput
+                    type="email"
+                    value={email}
+                    onIonChange={(e) => setEmail(e.detail.value!)}
+                    placeholder="Ex : monmail@gmail.com"
+                  ></IonInput>
                   <IonIcon
+                    className="ion-justify-content-center ion-align-self-center"
+                    slot="end"
+                    size="medium"
                     color="danger"
                     icon={closeCircleOutline}
-                    size="medium"
                   ></IonIcon>
-                </IonCol>
-                <IonCol size="11">
-                  <IonText
-                    className="ion-justify-content-center ion-align-self-center password-checkbox-text text-md"
-                    color="dark"
-                  >
-                    Minimum 8 caractères avec une majuscule
-                  </IonText>
-                </IonCol>
-              </IonRow>
-            ) : (
-              <IonRow>
-                <IonCol size="1">
+                </IonItem>
+              ) : (
+                <IonItem>
+                  <IonLabel position="floating" color="dark">
+                    E-mail :
+                  </IonLabel>
+                  <IonInput
+                    type="email"
+                    value={email}
+                    onIonChange={(e) => setEmail(e.detail.value!)}
+                    placeholder="Ex : monmail@gmail.com"
+                  ></IonInput>
                   <IonIcon
+                    className="ion-justify-content-center ion-align-self-center"
+                    slot="end"
                     color="success"
                     icon={checkmarkCircleOutline}
                     size="medium"
                   ></IonIcon>
-                </IonCol>
+                </IonItem>
+              )}
 
-                <IonCol size="11">
-                  <IonText
-                    className="ion-justify-content-center ion-align-self-center password-checkbox-text text-md"
-                    color="dark"
-                  >
-                    Minimum 8 caractères avec une majuscule
-                  </IonText>
-                </IonCol>
-              </IonRow>
-            )}
-            {showPassword === true ? (
-              <IonItem>
-                <IonLabel position="floating" color="dark">
-                  Mot de passe :
-                </IonLabel>
-                <IonInput
-                  className="register-password"
-                  type="text"
-                  value={pass}
-                  onIonChange={(e) => setPass(e.detail.value!)}
-                  onClick={() => setShowInscription(true)}
-                ></IonInput>
-                <IonIcon
-                  className="ion-justify-content-center ion-align-self-center"
-                  slot="end"
-                  size="medium"
-                  color="primary"
-                  icon={eyeOffOutline}
-                  onClick={() => handleShowPassword()}
-                ></IonIcon>
-              </IonItem>
-            ) : (
-              <IonItem>
-                <IonLabel position="floating" color="dark">
-                  Mot de passe :
-                </IonLabel>
-                <IonInput
-                  className="register-password"
-                  type="password"
-                  value={pass}
-                  onIonChange={(e) => setPass(e.detail.value!)}
-                  onClick={() => setShowInscription(true)}
-                ></IonInput>
-                <IonIcon
-                  className="ion-justify-content-center ion-align-self-center"
-                  slot="end"
-                  size="medium"
-                  color="primary"
-                  icon={eyeOutline}
-                  onClick={() => handleShowPassword()}
-                ></IonIcon>
-              </IonItem>
-            )}
+              {/* TELEPHONE */}
 
-            {/* PASSWORD CONFIRM */}
-            {showPasswordConfirm === true ? (
-              <IonItem>
-                <IonLabel position="floating" color="dark">
-                  Confirmation du mot de passe :
-                </IonLabel>
-                <IonInput
-                  className="register-password"
-                  type="text"
-                  value={passConfirm}
-                  onIonChange={(e) => setPassConfirm(e.detail.value!)}
-                ></IonInput>
-                <IonIcon
-                  className="ion-justify-content-center ion-align-self-center"
-                  slot="end"
-                  size="medium"
-                  color="primary"
-                  icon={eyeOffOutline}
-                  onClick={() => handleShowPasswordConfirm()}
-                ></IonIcon>
-              </IonItem>
-            ) : (
-              <IonItem>
-                <IonLabel position="floating" color="dark">
-                  Confirmation du mot de passe :
-                </IonLabel>
-                <IonInput
-                  className="register-password"
-                  type="password"
-                  value={passConfirm}
-                  onIonChange={(e) => setPassConfirm(e.detail.value!)}
-                ></IonInput>
-                <IonIcon
-                  className="ion-justify-content-center ion-align-self-center"
-                  slot="end"
-                  size="medium"
-                  color="primary"
-                  icon={eyeOutline}
-                  onClick={() => handleShowPasswordConfirm()}
-                ></IonIcon>
-              </IonItem>
-            )}
-            {pass !== null && passConfirm.length !== 0 ? (
-              <>
-                {passConfirm === pass ? (
-                  <IonRow>
-                    <IonIcon
-                      size="medium"
-                      color="success"
-                      icon={checkmarkCircleOutline}
-                    ></IonIcon>
-                    <IonText
-                      className="ion-justify-content-center ion-align-self-center password-checkbox-text text-md"
-                      color="dark"
-                    >
-                      Mots de passe identiques
-                    </IonText>
-                  </IonRow>
-                ) : (
-                  <IonRow>
+              {phoneNumber.length !== 10 || !phoneNumber.match(/^-?\d+$/) ? (
+                <IonItem>
+                  <IonLabel position="floating" color="dark">
+                    N° tel mobile : (10 chiffres.)
+                  </IonLabel>
+                  <IonInput
+                    type="tel"
+                    value={phoneNumber}
+                    onIonChange={(e) => setPhoneNumber(e.detail.value!)}
+                    placeholder="Ex : 0612345678"
+                  ></IonInput>
+                  <IonIcon
+                    className="ion-justify-content-center ion-align-self-center"
+                    slot="end"
+                    size="medium"
+                    color="danger"
+                    icon={closeCircleOutline}
+                  ></IonIcon>
+                </IonItem>
+              ) : (
+                <IonItem>
+                  <IonLabel position="floating" color="dark">
+                    N° tel mobile : (10 chiffres)
+                  </IonLabel>
+                  <IonInput
+                    type="tel"
+                    value={phoneNumber}
+                    onIonChange={(e) => setPhoneNumber(e.detail.value!)}
+                    placeholder="Ex : 0612345678"
+                  ></IonInput>
+                  <IonIcon
+                    className="ion-justify-content-center ion-align-self-center"
+                    slot="end"
+                    color="success"
+                    icon={checkmarkCircleOutline}
+                    size="medium"
+                  ></IonIcon>
+                </IonItem>
+              )}
+
+              {/* PASSWORD */}
+              {pass.length < 8 || pass.toLowerCase() === pass ? (
+                <IonRow>
+                  <IonCol size="1">
                     <IonIcon
                       color="danger"
                       icon={closeCircleOutline}
                       size="medium"
                     ></IonIcon>
+                  </IonCol>
+                  <IonCol size="11">
                     <IonText
                       className="ion-justify-content-center ion-align-self-center password-checkbox-text text-md"
                       color="dark"
                     >
-                      Ce n'est pas le même mot de passe
+                      Minimum 8 caractères avec une majuscule
                     </IonText>
-                  </IonRow>
-                )}
-              </>
-            ) : null}
+                  </IonCol>
+                </IonRow>
+              ) : (
+                <IonRow>
+                  <IonCol size="1">
+                    <IonIcon
+                      color="success"
+                      icon={checkmarkCircleOutline}
+                      size="medium"
+                    ></IonIcon>
+                  </IonCol>
 
-            {/* SUBMIT */}
-            <div className="ion-padding-vertical"></div>
-            <IonButton expand="full" onClick={writeUserData} color="primary">
-              Inscription
-            </IonButton>
-            <div className="ion-margin-top ion-text-center">
-              <IonRouterLink class="text-xl" color="dark" href="/">
-                Retour
-              </IonRouterLink>
+                  <IonCol size="11">
+                    <IonText
+                      className="ion-justify-content-center ion-align-self-center password-checkbox-text text-md"
+                      color="dark"
+                    >
+                      Minimum 8 caractères avec une majuscule
+                    </IonText>
+                  </IonCol>
+                </IonRow>
+              )}
+              {showPassword === true ? (
+                <IonItem>
+                  <IonLabel position="floating" color="dark">
+                    Mot de passe :
+                  </IonLabel>
+                  <IonInput
+                    className="register-password"
+                    type="text"
+                    value={pass}
+                    onIonChange={(e) => setPass(e.detail.value!)}
+                    onClick={() => setShowInscription(true)}
+                  ></IonInput>
+                  <IonIcon
+                    className="ion-justify-content-center ion-align-self-center"
+                    slot="end"
+                    size="medium"
+                    color="primary"
+                    icon={eyeOffOutline}
+                    onClick={() => handleShowPassword()}
+                  ></IonIcon>
+                </IonItem>
+              ) : (
+                <IonItem>
+                  <IonLabel position="floating" color="dark">
+                    Mot de passe :
+                  </IonLabel>
+                  <IonInput
+                    className="register-password"
+                    type="password"
+                    value={pass}
+                    onIonChange={(e) => setPass(e.detail.value!)}
+                    onClick={() => setShowInscription(true)}
+                  ></IonInput>
+                  <IonIcon
+                    className="ion-justify-content-center ion-align-self-center"
+                    slot="end"
+                    size="medium"
+                    color="primary"
+                    icon={eyeOutline}
+                    onClick={() => handleShowPassword()}
+                  ></IonIcon>
+                </IonItem>
+              )}
+
+              {/* PASSWORD CONFIRM */}
+              {showPasswordConfirm === true ? (
+                <IonItem>
+                  <IonLabel position="floating" color="dark">
+                    Confirmation du mot de passe :
+                  </IonLabel>
+                  <IonInput
+                    className="register-password"
+                    type="text"
+                    value={passConfirm}
+                    onIonChange={(e) => setPassConfirm(e.detail.value!)}
+                  ></IonInput>
+                  <IonIcon
+                    className="ion-justify-content-center ion-align-self-center"
+                    slot="end"
+                    size="medium"
+                    color="primary"
+                    icon={eyeOffOutline}
+                    onClick={() => handleShowPasswordConfirm()}
+                  ></IonIcon>
+                </IonItem>
+              ) : (
+                <IonItem>
+                  <IonLabel position="floating" color="dark">
+                    Confirmation du mot de passe :
+                  </IonLabel>
+                  <IonInput
+                    className="register-password"
+                    type="password"
+                    value={passConfirm}
+                    onIonChange={(e) => setPassConfirm(e.detail.value!)}
+                  ></IonInput>
+                  <IonIcon
+                    className="ion-justify-content-center ion-align-self-center"
+                    slot="end"
+                    size="medium"
+                    color="primary"
+                    icon={eyeOutline}
+                    onClick={() => handleShowPasswordConfirm()}
+                  ></IonIcon>
+                </IonItem>
+              )}
+              {pass !== null && passConfirm.length !== 0 ? (
+                <>
+                  {passConfirm === pass ? (
+                    <IonRow>
+                      <IonIcon
+                        size="medium"
+                        color="success"
+                        icon={checkmarkCircleOutline}
+                      ></IonIcon>
+                      <IonText
+                        className="ion-justify-content-center ion-align-self-center password-checkbox-text text-md"
+                        color="dark"
+                      >
+                        Mots de passe identiques
+                      </IonText>
+                    </IonRow>
+                  ) : (
+                    <IonRow>
+                      <IonIcon
+                        color="danger"
+                        icon={closeCircleOutline}
+                        size="medium"
+                      ></IonIcon>
+                      <IonText
+                        className="ion-justify-content-center ion-align-self-center password-checkbox-text text-md"
+                        color="dark"
+                      >
+                        Ce n'est pas le même mot de passe
+                      </IonText>
+                    </IonRow>
+                  )}
+                </>
+              ) : null}
+
+              {/* SUBMIT */}
+              <div className="ion-padding-vertical"></div>
+              <IonButton expand="full" onClick={writeUserData} color="primary">
+                Inscription
+              </IonButton>
+              <div className="ion-margin-top ion-text-center">
+                <IonRouterLink class="text-xl" color="dark" href="/">
+                  Retour
+                </IonRouterLink>
+              </div>
             </div>
-          </div>
-        </IonGrid>
-      ) : null}
-    </div>
+          </IonGrid>
+        ) : null}
+      </div>
+    </IonContent>
   );
 };
 

@@ -3,6 +3,11 @@
   max-width: 400px !important;
 }
 
+body {
+  position: initial;
+  overflow: initial;
+}
+
 .page-login .logo {
   margin: auto;
   margin-top: 20px;
@@ -17,8 +22,9 @@
 
 .page-login ion-button {
   margin-top: 50px;
+  width: 200px;
   height: 50px;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 #sign-up {

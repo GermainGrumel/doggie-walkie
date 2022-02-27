@@ -19,7 +19,6 @@ import shortid from "shortid";
 // different page views
 import Account from "./Account";
 import Login from "./Login";
-import SignUp from "./SignUp";
 import HomePage from "./HomePage";
 
 const Page: React.FC = () => {
@@ -32,8 +31,6 @@ const Page: React.FC = () => {
         return <Account key={shortid.generate()}></Account>;
       case "Login":
         return <Login key={shortid.generate()}></Login>;
-      case "SignUp":
-        return <SignUp key={shortid.generate()}></SignUp>;
       case "HomePage":
         return <HomePage key={shortid.generate()}></HomePage>;
       default:

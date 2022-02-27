@@ -3,11 +3,11 @@
   max-width: 400px !important;
 }
 
-// body {
-//   background-color: #fff;
-//   color: #838f97;
-//   height: fit-content;
-// }
+body {
+  position: initial;
+  overflow: initial;
+}
+
 .page-login {
   & .logo {
     margin: auto;
@@ -19,12 +19,14 @@
     display: block;
     margin-top: 15px;
     font-size: 16px;
+
   }
 
   & ion-button {
     margin-top: 50px;
+    width: 200px;
     height: 50px;
-    font-size: 14px;
+    font-size: 18px;
   }
 }
 

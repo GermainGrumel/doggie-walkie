@@ -23,7 +23,6 @@ import {
 } from "ionicons/icons";
 
 import React, { useState } from "react";
-import { useStore } from "react-redux";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -45,7 +44,7 @@ import "@ionic/react/css/display.css";
 import "../theme/variables.css";
 
 // Firebase REALTIME DATABASE
-import { getDatabase, ref, set, child, get } from "firebase/database";
+import { getDatabase, ref, set, child, get, push } from "firebase/database";
 import { registerUser } from "../config/firebase";
 
 // CUSTOM STYLES
@@ -75,7 +74,41 @@ const Login: React.FC = () => {
   const [data, setData] = React.useState(false);
 
   const history = useHistory();
-  const state = useStore().getState();
+  const db = getDatabase();
+  const dbRef = ref(db);
+
+  const readUserData = () => {
+    get(child(dbRef, `users/${name + familyName}`))
+      .then((userData) => {
+        if (userData.exists()) {
+          console.log(userData.val());
+        } else {
+          console.log("No data available");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  const writeUserData = () => {
+    signUpRules();
+    const newUserUid = push(child(ref(db), "users")).key;
+    const userData = {
+      username: name + " " + familyName,
+      gender: gender,
+      password: pass,
+      email: email,
+      phoneNumber: phoneNum,
+    };
+    if (data) {
+      try {
+        set(ref(db, "users/" + newUserUid), userData);
+        history.push("/page/HomePage");
+      } catch (e) {
+        console.log("ERROR FROM SIGN UP", e);
+      }
+    }
+  };
 
   async function register() {
     if (password !== cpassword) {
@@ -100,26 +133,6 @@ const Login: React.FC = () => {
 
   /* ON ENLEVE LA PREMIERE LETTRE DU TELEPHONE POUR EVITER DES +3306  */
   const phoneNum: string = "+33" + phoneNumber.substring(1);
-
-  const writeUserData = () => {
-    signUpRules();
-    console.log("data :>> ", data);
-    if (data) {
-      const db = getDatabase();
-      try {
-        set(ref(db, "users/" + name + familyName), {
-          username: name + " " + familyName,
-          gender: gender,
-          password: pass,
-          email: email,
-          phoneNumber: phoneNum,
-        });
-        history.push("/page/HomePage");
-      } catch (e) {
-        console.log("ERROR FROM SIGN UP", e);
-      }
-    }
-  };
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -281,6 +294,13 @@ const Login: React.FC = () => {
                 type="submit"
               >
                 Créer un compte
+              </IonButton>
+              <IonButton
+                onClick={readUserData}
+                className="ion-margin-top"
+                type="submit"
+              >
+                Fonction
               </IonButton>
             </IonRow>
           </>

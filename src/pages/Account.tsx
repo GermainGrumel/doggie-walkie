@@ -17,7 +17,8 @@ import {
 } from "@ionic/react";
 import { addOutline, powerOutline } from "ionicons/icons";
 import React from "react";
-import { useParams } from "react-router";
+import { useHistory, useParams } from "react-router";
+import { logoutUser } from "../config/firebase";
 // import { useStore } from "react-redux";
 // AVATAR
 import { Md5 } from "md5-typescript";
@@ -26,18 +27,16 @@ const Page: React.FC = () => {
   //   const state = useStore().getState();
   // eslint-disable-next-line
   const { name } = useParams<{ name: string }>();
+  const history = useHistory();
   //   let endpoint = state.endpoint;
 
   // AVATAR
   //   const gravatar = "https://gravatar.com/avatar/" + Md5.init(state.email);
 
-  //   function logout() {
-  //     Auth.currentAuthenticatedUser()
-  //       .then((user) => {
-  //         Auth.signOut({ global: true });
-  //       })
-  //       .catch((err) => {});
-  //   }
+  const logout = () => {
+    logoutUser();
+    history.push("/page/Login");
+  };
   return (
     <IonContent className="page-account">
       {/* <div className="background-container">
@@ -141,9 +140,9 @@ const Page: React.FC = () => {
           <IonCol>
             <IonItem
               detail={false}
-              //   onClick={(e) => {
-              //     logout();
-              //   }}
+              onClick={(e) => {
+                logout();
+              }}
             >
               <IonCard>
                 <IonCardHeader>

@@ -50,11 +50,14 @@ import { registerUser } from "../config/firebase";
 
 // CUSTOM STYLES
 import "../styles/Login.scss";
+import { useHistory } from "react-router";
 const Login: React.FC = () => {
+  // CONNEXION
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [cpassword, setCPassword] = useState<string>("");
 
+  // INSCRIPTION
   const [pass, setPass] = useState<string>("");
   const [passConfirm, setPassConfirm] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -70,8 +73,8 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = React.useState(false);
 
+  const history = useHistory();
   const state = useStore().getState();
-  console.log(showConnexion);
 
   async function register() {
     if (password !== cpassword) {
@@ -87,10 +90,10 @@ const Login: React.FC = () => {
     const res = await registerUser(username, password);
     console.log("res :>> ", res);
     if (res) {
-      setColor("danger");
+      setColor("success");
       setMessage(`Bienvenue ${username}`);
       setShowToast(true);
-      window.history.replaceState({}, "", "/home");
+      history.push("/page/HomePage");
     }
   }
 
@@ -99,13 +102,18 @@ const Login: React.FC = () => {
 
   const writeUserData = () => {
     const db = getDatabase();
-    set(ref(db, "users/" + state.uid), {
-      username: name + " " + familyName,
-      gender: gender,
-      password: pass,
-      email: email,
-      phoneNumber: phoneNum,
-    });
+    try {
+      set(ref(db, "users/" + name + familyName), {
+        username: name + " " + familyName,
+        gender: gender,
+        password: pass,
+        email: email,
+        phoneNumber: phoneNum,
+      });
+      history.push("/page/HomePage");
+    } catch (e) {
+      console.log("ERROR FROM SIGN UP", e);
+    }
   };
 
   const handleShowPassword = () => {

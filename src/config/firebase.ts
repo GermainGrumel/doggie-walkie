@@ -4,7 +4,7 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  User,
+  signOut,
 } from "firebase/auth";
 export const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -19,28 +19,29 @@ const app = initializeApp(firebaseConfig);
 
 const auth = getAuth();
 
-export function getCurrentUser(): Promise<User> {
+export function getCurrentUser() {
   return new Promise((resolve, reject) => {
-    // firebase.
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.log("user logged in", user);
         resolve(user);
       } else {
-        reject(user);
+        console.log("not logged in", user);
+        resolve(null);
       }
     });
   });
 }
 
-// const uid = user?.uid;
-// const username = user?.displayName;
-// const email = user?.email;
-// const phoneNumber = user?.phoneNumber;
-// export async function logoutUser() {
-//   // firebase.auth().signOut()
-//   console.log("Logging out...");
-//   return signOut(getAuth());
-// }
+export async function logoutUser() {
+  return signOut(auth)
+    .then(() => {
+      console.log("Logging out...");
+    })
+    .catch((error) => {
+      console.log("error", error);
+    });
+}
 export async function loginUser(username: string, password: string) {
   const email = `${username}`; // vérifier mail
   try {

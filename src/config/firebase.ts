@@ -17,8 +17,7 @@ export const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 
-const auth = getAuth();
-console.log("auth", auth);
+export const auth: any = getAuth();
 export function getCurrentUser() {
   return new Promise((resolve, reject) => {
     onAuthStateChanged(auth, (user) => {

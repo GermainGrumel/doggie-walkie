@@ -44,18 +44,8 @@ import "@ionic/react/css/display.css";
 import "../theme/variables.css";
 
 // Firebase REALTIME DATABASE
-import {
-  getDatabase,
-  ref,
-  set,
-  child,
-  get,
-  push,
-  query,
-  orderByChild,
-} from "firebase/database";
-import { registerUser } from "../config/firebase";
-
+import { getDatabase, ref, set, child, get, push } from "firebase/database";
+import { auth, registerUser } from "../config/firebase";
 // CUSTOM STYLES
 import "../styles/Login.scss";
 import { useHistory } from "react-router";
@@ -86,18 +76,19 @@ const Login: React.FC = () => {
   const db = getDatabase();
   const dbRef = ref(db);
   const newUserUid = push(child(ref(db), "users")).key;
+  console.log(newUserUid);
+
   // https://firebase.google.com/docs/database/web/lists-of-data
-  // const topUserPostsRef = query(
-  //   ref(db, "users/" + newUserUid),
-  //   orderByChild("name")
-  // );
-  // console.log("topUserPostsRef", topUserPostsRef);
 
   const readUserData = () => {
-    get(child(dbRef, `users/${name + familyName}`))
+    get(child(dbRef, `users/${newUserUid}`))
       .then((userData) => {
         if (userData.exists()) {
-          console.log(userData.val());
+          const userFromDB = userData.val();
+          console.log(
+            'userFromDB["newUserUid"] :>> ',
+            userFromDB["newUserUid"]
+          );
         } else {
           console.log("No data available");
         }
@@ -114,10 +105,14 @@ const Login: React.FC = () => {
       password: pass,
       email: email,
       phoneNumber: phoneNum,
+      id: newUserUid,
     };
     if (data) {
       try {
         set(ref(db, "users/" + newUserUid), userData).then(() => {
+          auth.currentUser = [];
+          console.log("auth", auth.currentUser);
+          auth.currentUser.push(userData);
           history.push("/page/HomePage");
         });
       } catch (e) {

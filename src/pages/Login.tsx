@@ -49,6 +49,22 @@ import { auth, registerUser } from "../config/firebase";
 // CUSTOM STYLES
 import "../styles/Login.scss";
 import { useHistory } from "react-router";
+import { onAuthStateChanged } from "firebase/auth";
+
+export async function getCurrentUser() {
+  return new Promise((resolve, reject) => {
+    onAuthStateChanged(auth, (currentUser: any) => {
+      if (currentUser) {
+        console.log("user logged in", currentUser);
+        resolve(currentUser);
+      } else {
+        console.log("not logged in", currentUser);
+        resolve(null);
+      }
+    });
+  });
+}
+
 const Login: React.FC = () => {
   // CONNEXION
   const [username, setUsername] = useState<string>("");
@@ -76,7 +92,6 @@ const Login: React.FC = () => {
   const db = getDatabase();
   const dbRef = ref(db);
   const newUserUid = push(child(ref(db), "users")).key;
-  console.log(newUserUid);
 
   // https://firebase.google.com/docs/database/web/lists-of-data
 
@@ -113,7 +128,9 @@ const Login: React.FC = () => {
           auth.currentUser = [];
           console.log("auth", auth.currentUser);
           auth.currentUser.push(userData);
-          history.push("/page/HomePage");
+          const currentUser = auth.currentUser;
+          getCurrentUser(currentUser);
+          // history.push("/page/HomePage");
         });
       } catch (e) {
         console.log("ERROR FROM SIGN UP", e);

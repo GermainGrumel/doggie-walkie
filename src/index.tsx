@@ -5,8 +5,7 @@ import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import { createStore } from "redux";
-import { getCurrentUser } from "./config/firebase";
-
+import { getCurrentUser } from "./pages/Login";
 getCurrentUser().then((user) => {
   console.log("user", user);
 

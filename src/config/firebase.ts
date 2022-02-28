@@ -18,19 +18,21 @@ export const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth: any = getAuth();
-export function getCurrentUser() {
-  return new Promise((resolve, reject) => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("user logged in", user);
-        resolve(user);
-      } else {
-        console.log("not logged in", user);
-        resolve(null);
-      }
-    });
-  });
-}
+console.log("AUTH FROM FIREBASE CONFIG", auth);
+
+// export function getCurrentUser() {
+//   return new Promise((resolve, reject) => {
+//     onAuthStateChanged(auth, (user) => {
+//       if (user) {
+//         console.log("user logged in", user);
+//         resolve(user);
+//       } else {
+//         console.log("not logged in", user);
+//         resolve(null);
+//       }
+//     });
+//   });
+// }
 
 export async function logoutUser() {
   return signOut(auth)

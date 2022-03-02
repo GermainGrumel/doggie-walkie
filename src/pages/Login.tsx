@@ -50,13 +50,15 @@ import { auth, registerUser } from "../config/firebase";
 import "../styles/Login.scss";
 import { useHistory } from "react-router";
 import { onAuthStateChanged } from "firebase/auth";
+import { triggerAuth } from "../index";
 
 export async function getCurrentUser() {
   return new Promise((resolve, reject) => {
     onAuthStateChanged(auth, (currentUser: any) => {
       if (currentUser) {
         console.log("user logged in", currentUser);
-        resolve(currentUser);
+        console.log("auth :>> ", auth);
+        resolve(auth);
       } else {
         console.log("not logged in", currentUser);
         resolve(null);
@@ -92,7 +94,13 @@ const Login: React.FC = () => {
   const db = getDatabase();
   const dbRef = ref(db);
   const newUserUid = push(child(ref(db), "users")).key;
-
+  const today = new Date(),
+    current_time =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
   // https://firebase.google.com/docs/database/web/lists-of-data
 
   const readUserData = () => {
@@ -114,6 +122,7 @@ const Login: React.FC = () => {
   };
   const writeUserData = () => {
     signUpRules();
+
     const userData = {
       username: name + " " + familyName,
       gender: gender,
@@ -121,15 +130,15 @@ const Login: React.FC = () => {
       email: email,
       phoneNumber: phoneNum,
       id: newUserUid,
+      creation_date: current_time,
     };
     if (data) {
       try {
         set(ref(db, "users/" + newUserUid), userData).then(() => {
           auth.currentUser = [];
-          console.log("auth", auth.currentUser);
           auth.currentUser.push(userData);
-          const currentUser = auth.currentUser;
-          getCurrentUser(currentUser);
+          getCurrentUser();
+          triggerAuth();
           // history.push("/page/HomePage");
         });
       } catch (e) {

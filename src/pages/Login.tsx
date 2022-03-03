@@ -120,6 +120,7 @@ const Login: React.FC = () => {
         console.error(error);
       });
   };
+  console.log("test", test);
   const writeUserData = () => {
     signUpRules();
 

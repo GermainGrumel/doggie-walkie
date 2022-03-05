@@ -51,7 +51,7 @@ import "../styles/Login.scss";
 import { useHistory } from "react-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { triggerAuth } from "../index";
-
+// wip
 export async function getCurrentUser() {
   return new Promise((resolve, reject) => {
     onAuthStateChanged(auth, (currentUser: any) => {

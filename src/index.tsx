@@ -12,7 +12,6 @@ export const triggerAuth = () => {
     console.log("user", user);
     const setUser = (state = {}, action: any) => {
       state = action.user;
-      console.log("state", state);
 
       return state;
     };

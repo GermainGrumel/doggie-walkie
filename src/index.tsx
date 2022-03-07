@@ -21,7 +21,7 @@ export const triggerAuth = () => {
       id: 0,
       user: userData, // défini plus haut
     });
-
+    console.log("user :>> ", user);
     // Redux affiche user
     store.dispatch(setData(user));
     console.log(store.dispatch(setData(user)));

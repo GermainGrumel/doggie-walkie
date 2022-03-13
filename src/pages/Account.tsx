@@ -19,19 +19,19 @@ import { addOutline, powerOutline } from "ionicons/icons";
 import React from "react";
 import { useHistory, useParams } from "react-router";
 import { logoutUser } from "../config/firebase";
-// import { useStore } from "react-redux";
+import { useStore } from "react-redux";
 // AVATAR
 import { Md5 } from "md5-typescript";
 
 const Page: React.FC = () => {
-  //   const state = useStore().getState();
+  const state = useStore().getState();
   // eslint-disable-next-line
   const { name } = useParams<{ name: string }>();
   const history = useHistory();
   //   let endpoint = state.endpoint;
 
   // AVATAR
-  //   const gravatar = "https://gravatar.com/avatar/" + Md5.init(state.email);
+  const gravatar = "https://gravatar.com/avatar/" + Md5.init(state.email);
 
   const logout = () => {
     logoutUser();
@@ -39,7 +39,7 @@ const Page: React.FC = () => {
   };
   return (
     <IonContent className="page-account">
-      {/* <div className="background-container">
+      <div className="background-container">
         <IonImg className="background-cover" src="assets/tmp/acccount.png" />
       </div>
       <IonRow className="block-avatar ion-justify-content-center">
@@ -48,7 +48,7 @@ const Page: React.FC = () => {
             <IonImg src={gravatar} />
           </IonAvatar>
         </IonCol>
-      </IonRow> */}
+      </IonRow>
 
       <div className="user-name ion-text-center">
         <IonText className="text-xxl">Bienvenue</IonText>

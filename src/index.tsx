@@ -7,25 +7,43 @@ import { Provider } from "react-redux";
 import { createStore } from "redux";
 import { getCurrentUser } from "./pages/Login";
 
+const saveToLocalStorage = (setUser: any) => {
+  try {
+    localStorage.setItem("state", setUser);
+  } catch (e) {
+    console.error(e);
+  }
+};
+const loadFromLocalStorage = () => {
+  try {
+    const stateStr: any = localStorage.getItem("state");
+    console.log(Object.values(stateStr));
+    return stateStr ? JSON.parse(stateStr) : undefined;
+  } catch (e) {
+    console.error(e);
+    return undefined;
+  }
+};
+
 export const triggerAuth = () => {
   getCurrentUser().then((user) => {
-    console.log("user", user);
     const setUser = (state = {}, action: any) => {
       state = action.user;
-
       return state;
     };
-    const store = createStore(setUser);
     const setData = (userData: any) => ({
       type: "SET_USER",
       id: 0,
       user: userData, // défini plus haut
     });
-    console.log("user :>> ", user);
+    const store = createStore(setUser);
+    loadFromLocalStorage();
+    store.subscribe(() => {
+      saveToLocalStorage(store.getState());
+    });
     // Redux affiche user
     store.dispatch(setData(user));
-    console.log(store.dispatch(setData(user)));
-    console.log("STORE", store);
+    console.log("user", user);
 
     ReactDOM.render(
       <Provider store={store}>

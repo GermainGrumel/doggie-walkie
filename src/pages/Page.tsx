@@ -20,6 +20,7 @@ import shortid from "shortid";
 import Account from "./Account";
 import Login from "./Login";
 import HomePage from "./HomePage";
+import RegisterDog from "./RegisterDog";
 
 const Page: React.FC = () => {
   const { name } = useParams<{ name: string }>();
@@ -33,6 +34,8 @@ const Page: React.FC = () => {
         return <Login key={shortid.generate()}></Login>;
       case "HomePage":
         return <HomePage key={shortid.generate()}></HomePage>;
+      case "RegisterDog":
+        return <RegisterDog key={shortid.generate()}></RegisterDog>;
       default:
     }
   };
@@ -50,6 +53,8 @@ const Page: React.FC = () => {
         return "Inscription";
       case "HomePage":
         return "Accueil";
+      case "RegisterDog":
+        return "Inscris ton chien !";
       default:
         return name;
     }

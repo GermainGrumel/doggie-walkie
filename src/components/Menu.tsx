@@ -37,34 +37,28 @@ interface AppPage {
 
 const appPages: AppPage[] = [
   {
-    title: "Inbox",
-    url: "/page/Inbox",
+    title: "Homepage",
+    url: "/page/HomePage",
     iosIcon: mailOutline,
     mdIcon: mailSharp,
   },
   {
-    title: "Outbox",
-    url: "/page/Outbox",
+    title: "Faire promener mon chien",
+    url: "/page/FairePromener",
     iosIcon: paperPlaneOutline,
     mdIcon: paperPlaneSharp,
   },
   {
-    title: "Favorites",
-    url: "/page/Favorites",
+    title: "Promener un chien",
+    url: "/page/Promener",
     iosIcon: heartOutline,
     mdIcon: heartSharp,
   },
   {
-    title: "Login",
-    url: "/page/Login",
+    title: "Mes promenades",
+    url: "/page/Promenades",
     iosIcon: archiveOutline,
     mdIcon: archiveSharp,
-  },
-  {
-    title: "Trash",
-    url: "/page/SignUp",
-    iosIcon: trashOutline,
-    mdIcon: trashSharp,
   },
   {
     title: "Account",
@@ -73,8 +67,6 @@ const appPages: AppPage[] = [
     mdIcon: warningSharp,
   },
 ];
-
-const labels = ["Family", "Friends", "Notes", "Work", "Travel", "Reminders"];
 
 const Menu: React.FC = () => {
   const location = useLocation();
@@ -108,16 +100,7 @@ const Menu: React.FC = () => {
             );
           })}
         </IonList>
-
-        <IonList id="labels-list">
-          <IonListHeader>Labels</IonListHeader>
-          {labels.map((label, index) => (
-            <IonItem lines="none" key={index}>
-              <IonIcon slot="start" icon={bookmarkOutline} />
-              <IonLabel>{label}</IonLabel>
-            </IonItem>
-          ))}
-        </IonList>
+        h
       </IonContent>
     </IonMenu>
   );

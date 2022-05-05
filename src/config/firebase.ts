@@ -15,6 +15,7 @@ export const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
   databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
 };
+
 const app = initializeApp(firebaseConfig);
 
 export const auth: any = getAuth();

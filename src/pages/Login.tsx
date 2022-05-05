@@ -49,23 +49,7 @@ import { auth, registerUser } from "../config/firebase";
 // CUSTOM STYLES
 import "../styles/Login.scss";
 import { useHistory } from "react-router";
-import { onAuthStateChanged } from "firebase/auth";
-import { triggerAuth } from "../index";
-// wip
-export async function getCurrentUser() {
-  return new Promise((resolve, reject) => {
-    onAuthStateChanged(auth, (currentUser: any) => {
-      if (currentUser) {
-        console.log("user logged in", currentUser);
-        console.log("auth :>> ", auth);
-        resolve(auth);
-      } else {
-        console.log("not logged in", currentUser);
-        resolve(null);
-      }
-    });
-  });
-}
+import { store } from "../index";
 
 const Login: React.FC = () => {
   // CONNEXION
@@ -92,8 +76,10 @@ const Login: React.FC = () => {
 
   const history = useHistory();
   const db = getDatabase();
+
   const dbRef = ref(db);
   const newUserUid = push(child(ref(db), "users")).key;
+
   const today = new Date(),
     current_time =
       today.getFullYear() +
@@ -104,14 +90,11 @@ const Login: React.FC = () => {
   // https://firebase.google.com/docs/database/web/lists-of-data
 
   const readUserData = () => {
-    get(child(dbRef, `users/${newUserUid}`))
+    get(child(dbRef, `users}`))
       .then((userData) => {
         if (userData.exists()) {
           const userFromDB = userData.val();
-          console.log(
-            'userFromDB["newUserUid"] :>> ',
-            userFromDB["newUserUid"]
-          );
+          console.log('userFromDB["newUserUid"] :>> ', userFromDB);
         } else {
           console.log("No data available");
         }
@@ -133,13 +116,18 @@ const Login: React.FC = () => {
       creation_date: current_time,
     };
     if (data) {
+      const setData = (userData: any) => ({
+        type: "SET_USER",
+        id: newUserUid,
+        user: userData, // défini plus haut
+      });
+      store.dispatch(setData(userData));
+      // Redux affiche user
       try {
         set(ref(db, "users/" + newUserUid), userData).then(() => {
-          auth.currentUser = [];
-          auth.currentUser.push(userData);
-          getCurrentUser();
-          triggerAuth();
-          // history.push("/page/HomePage");
+          // auth.currentUser = [userData];
+          // getCurrentUser();
+          history.push("/page/HomePage");
         });
       } catch (e) {
         console.log("ERROR FROM SIGN UP", e);

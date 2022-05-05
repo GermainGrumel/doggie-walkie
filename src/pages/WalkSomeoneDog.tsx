@@ -1,26 +1,26 @@
+import React, { useEffect } from "react";
 import {
-  IonContent,
   IonGrid,
+  IonText,
+  IonContent,
   IonRow,
   IonCol,
-  IonText,
+  IonTitle,
   IonButton,
   IonCard,
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
+  IonCardContent,
   IonItem,
-  IonAvatar,
-  IonTitle,
   IonRouterLink,
+  IonAvatar,
 } from "@ionic/react";
-import React, { useEffect } from "react";
-import { useParams } from "react-router";
-import { useStore } from "react-redux";
 import { child, get, getDatabase, ref } from "firebase/database";
-import { fetchDogData } from "../realtimeDatabase/database";
-const HomePage: React.FC = () => {
-  // eslint-disable-next-line
+import { useStore } from "react-redux";
+import { useParams } from "react-router";
+
+function RegisterDog() {
   const { name } = useParams<{ name: string }>();
   const state = useStore().getState();
   const user = state.user;
@@ -51,52 +51,18 @@ const HomePage: React.FC = () => {
     fetchDogData();
   }, []);
 
-  let welcomeMsg = (
-    <IonCol class="slider ion-text-center">
-      {/* <IonImg className="logo" src="assets/tmp/logo-only.svg" /> */}
-      <IonText class="ion-text-uppercase" color="primary">
-        DogWalker
-      </IonText>
-      <IonRow class="ion-justify-content-center">
-        {/* <IonCol size="auto">
-          <IonImg class="waving-hand" src="assets/tmp/waving_hand.svg" />
-        </IonCol> */}
-        <IonCol size="auto">
-          <IonText class="text-welcome">
-            Content de te revoir
-            {" " + "user.username"} !
-          </IonText>
-        </IonCol>
-      </IonRow>
-      <IonRow class="ion-justify-content-center">
-        <IonCol size="auto">
-          <IonText>
-            Tu veux faire promener ton chien ou en promener un ?
-          </IonText>
-        </IonCol>
-      </IonRow>
-    </IonCol>
-  );
-
   return (
-    <IonContent class="page-home">
-      <IonRow>{welcomeMsg}</IonRow>
-
+    <IonContent>
       <IonGrid>
         <IonRow class="ion-justify-content-center">
-          <IonCol size="auto">
-            <IonItem href="/page/WalkMyDog" detail={true} lines="none">
-              <IonButton>Faire promener mon chien</IonButton>
-            </IonItem>
-            <IonItem href="/page/WalkSomeoneDog" detail={true} lines="none">
-              <IonButton>Promener le chien de quelqu'un</IonButton>
-            </IonItem>
+          <IonCol>
+            <IonTitle>Vous souhaitez promener le chien de quelqu'un ?</IonTitle>
           </IonCol>
         </IonRow>
 
         <IonRow class="ion-justify-content-center">
-          <IonCol size="auto">
-            <IonTitle>Trouver un chien à proximité</IonTitle>
+          <IonCol>
+            <IonText class="text-lg">À proximité de vous : </IonText>
           </IonCol>
         </IonRow>
 
@@ -125,8 +91,12 @@ const HomePage: React.FC = () => {
             </IonCol>
           ))}
         </IonRow>
+
+        <IonRow class="ion-justify-content-center">
+          <IonButton color="primary">Voir plus</IonButton>
+        </IonRow>
       </IonGrid>
     </IonContent>
   );
-};
-export default HomePage;
+}
+export default RegisterDog;

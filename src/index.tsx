@@ -1,60 +1,46 @@
-import React from "react";
-import ReactDOM from "react-dom";
 import App from "./App";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import reportWebVitals from "./reportWebVitals";
-import { Provider } from "react-redux";
-import { createStore } from "redux";
-import { getCurrentUser } from "./pages/Login";
+import { Provider, useStore } from "react-redux";
+import { createStore, applyMiddleware, combineReducers } from "redux";
+import authReducer from "./store/reducers/authReducer";
+import firebase from "firebase/compat/app";
 
-const saveToLocalStorage = (setUser: any) => {
-  try {
-    localStorage.setItem("state", setUser);
-  } catch (e) {
-    console.error(e);
-  }
-};
-const loadFromLocalStorage = () => {
-  try {
-    const stateStr: any = localStorage.getItem("state");
-    console.log(Object.values(stateStr));
-    return stateStr ? JSON.parse(stateStr) : undefined;
-  } catch (e) {
-    console.error(e);
-    return undefined;
-  }
+import ReactDOM from "react-dom";
+import thunk from "redux-thunk";
+import {
+  ReactReduxFirebaseProvider,
+  firebaseReducer,
+} from "react-redux-firebase";
+
+const rrfConfig = {
+  userProfile: "users",
+  useFirestoreForProfile: true,
 };
 
-export const triggerAuth = () => {
-  getCurrentUser().then((user) => {
-    const setUser = (state = {}, action: any) => {
-      state = action.user;
-      return state;
-    };
-    const setData = (userData: any) => ({
-      type: "SET_USER",
-      id: 0,
-      user: userData, // défini plus haut
-    });
-    const store = createStore(setUser);
-    loadFromLocalStorage();
-    store.subscribe(() => {
-      saveToLocalStorage(store.getState());
-    });
-    // Redux affiche user
-    store.dispatch(setData(user));
-    console.log("user", user);
+const rootReducer = combineReducers({
+  firebase: firebaseReducer,
+  auth: authReducer,
+});
 
-    ReactDOM.render(
-      <Provider store={store}>
-        <App />
-      </Provider>,
-      document.getElementById("root")
-    );
-  });
+export const store = createStore(rootReducer, applyMiddleware(thunk));
+const rrfProps = {
+  firebase,
+  config: rrfConfig,
+  dispatch: store.dispatch,
+  // createFirestoreInstance // <- needed if using firestore
 };
+console.log(rrfProps);
 
-triggerAuth();
+ReactDOM.render(
+  <Provider store={store}>
+    <ReactReduxFirebaseProvider {...rrfProps}>
+      <App />
+    </ReactReduxFirebaseProvider>
+  </Provider>,
+  document.getElementById("root")
+);
+
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://cra.link/PWA

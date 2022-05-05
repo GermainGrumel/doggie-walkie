@@ -1,0 +1,180 @@
+.page-account .block-avatar {
+  margin-top: -90px;
+}
+
+.page-account .block-avatar .avatar-default {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  background: var(--ion-color-medium);
+  border: 1px solid #fff;
+  border-radius: 100%;
+  width: 80px;
+  height: 80px;
+}
+
+.page-account .block-avatar .avatar-default ion-icon {
+  margin: auto;
+  color: #fff;
+  font-size: 50px;
+}
+
+.page-account .block-avatar ion-avatar {
+  background: #fff;
+  border: 1px solid #fff;
+  width: 80px;
+  height: 80px;
+}
+
+.page-account .block-avatar .avatar {
+  position: relative;
+}
+
+.page-account .block-avatar .avatar .add-avatar {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--ion-color-primary);
+  border: 2px solid #fefefe;
+  border-radius: 100%;
+  color: #fefefe;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+}
+
+.page-account .block-avatar .avatar .add-avatar div {
+  margin: auto;
+}
+
+.page-account .block-avatar .avatar .add-avatar ion-icon {
+  font-size: 22px;
+}
+
+.page-account .top-text {
+  width: 80%;
+  margin: auto;
+}
+
+.page-account div.background-container {
+  width: 100%;
+  height: 30vh;
+}
+
+.page-account div.background-container ion-img.background-cover {
+  -o-object-fit: cover !important;
+     object-fit: cover !important;
+  height: 25vh;
+}
+
+.page-account ion-card {
+  height: 100%;
+  width: 100%;
+  border: 1px solid var(--ion-color-medium);
+  margin: auto;
+  text-align: center;
+}
+
+.page-account ion-card.premium-content {
+  background-color: var(--ion-color-primary);
+  border: 0 !important;
+  -webkit-box-shadow: none !important;
+          box-shadow: none !important;
+  border: none !important;
+  border-style: none !important;
+}
+
+.page-account ion-card.premium-content ion-card-title {
+  color: #fff;
+}
+
+.page-account ion-card.premium-content ion-card-content {
+  background-color: var(--ion-color-primary);
+}
+
+.page-account .logout-card {
+  height: 300px;
+  margin: auto;
+}
+
+.page-account .logout-card ion-card {
+  width: 100%;
+}
+
+.page-account .logout-card ion-card ion-card-title {
+  font-size: 1rem;
+}
+
+.page-account .logout-card ion-card .next-to-each-other {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.page-account .logout-card ion-card .next-to-each-other ion-icon {
+  padding-right: 5px;
+  height: 20px !important;
+}
+
+@media (max-width: 750px) {
+  .page-account .logout-card,
+  .page-account ion-card {
+    width: 90vw;
+  }
+}
+
+.page-account .user-name {
+  margin-top: 10px;
+}
+
+.page-account .account-links {
+  margin-top: 25px;
+  padding: 0;
+}
+
+.page-account .account-links ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --min-height: 53px;
+}
+
+.page-account .account-links ion-row {
+  width: 100%;
+}
+
+.page-account .account-links ion-icon {
+  margin-top: 2px;
+}
+
+.footer-buttons {
+  margin: auto !important;
+}
+
+.footer-buttons .width-250px {
+  width: 250px;
+}
+
+ion-content.page-footer .form {
+  width: 50%;
+  margin: auto;
+}
+
+ion-content.page-footer .form ion-label {
+  color: var(--ion-color-primary);
+  font-size: 16px !important;
+}
+
+ion-content.page-footer .form ion-input {
+  color: var(--ion-color-dark);
+  font-size: 14px !important;
+}
+/*# sourceMappingURL=Account.css.map */

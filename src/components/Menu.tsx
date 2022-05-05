@@ -21,8 +21,6 @@ import {
   mailSharp,
   paperPlaneOutline,
   paperPlaneSharp,
-  trashOutline,
-  trashSharp,
   warningOutline,
   warningSharp,
 } from "ionicons/icons";

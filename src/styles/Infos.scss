@@ -1,0 +1,17 @@
+ 
+ .page-footer{
+.form
+{ 
+    & ion-item {
+    margin-bottom: 15px;
+    border: 0.5px solid var(--ion-color-tertiary);
+    border-radius: 10px;
+    padding:10px;
+    margin: auto;
+    margin-top: 15px;
+    & ion-input{
+        font-size: 18px !important;
+    }
+}
+}
+}

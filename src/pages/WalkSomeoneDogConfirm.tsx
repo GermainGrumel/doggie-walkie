@@ -9,6 +9,7 @@ import {
   IonButton,
   IonImg,
   IonBackButton,
+  IonToast,
 } from "@ionic/react";
 import { useDispatch, useStore } from "react-redux";
 import { useParams } from "react-router";
@@ -23,6 +24,9 @@ function WalkSomeoneDogConfirm() {
   const dispatch = useDispatch();
   const [chosenDog, setChosenDog] = React.useState("");
   const [dogsFromDb, setDogsFromDb] = React.useState([]);
+  const [showToast, setShowToast] = React.useState(false);
+  const [message, setMessage] = React.useState<string>("");
+  const [color, setColor] = React.useState<string>("");
 
   const fetchDogData = () => {
     get(child(dbRef, `dogs`))
@@ -47,9 +51,29 @@ function WalkSomeoneDogConfirm() {
     fetchDogData();
   }, []);
 
+  const attributeDog = () => {
+    setColor("success");
+    setMessage("Vous pouvez aller chercher dog.name dans 10 mins");
+    setShowToast(true);
+  };
   return (
     <IonContent>
       <IonGrid>
+        <IonToast
+          isOpen={showToast}
+          onDidDismiss={() => setShowToast(false)}
+          message={message}
+          position="middle"
+          color={color}
+          duration={5000}
+          buttons={[
+            {
+              icon: "close",
+              role: "Fermer",
+              handler: () => {},
+            },
+          ]}
+        />
         <IonBackButton>a</IonBackButton>
         <IonRow class="ion-justify-content-center ion-text-center">
           <IonCol>
@@ -80,7 +104,11 @@ function WalkSomeoneDogConfirm() {
 
         <IonRow class="ion-justify-content-center ion-text-center">
           <IonCol>
-            <IonButton color="primary" href="page/HomePage">
+            <IonButton
+              onClick={attributeDog}
+              color="primary"
+              href="page/HomePage"
+            >
               Valider l'action
             </IonButton>
           </IonCol>

@@ -42,13 +42,13 @@ const appPages: AppPage[] = [
   },
   {
     title: "Faire promener mon chien",
-    url: "/page/FairePromener",
+    url: "/page/WalkMyDog",
     iosIcon: paperPlaneOutline,
     mdIcon: paperPlaneSharp,
   },
   {
     title: "Promener un chien",
-    url: "/page/Promener",
+    url: "/page/WalkSomeoneDog",
     iosIcon: heartOutline,
     mdIcon: heartSharp,
   },
@@ -98,7 +98,6 @@ const Menu: React.FC = () => {
             );
           })}
         </IonList>
-        h
       </IonContent>
     </IonMenu>
   );

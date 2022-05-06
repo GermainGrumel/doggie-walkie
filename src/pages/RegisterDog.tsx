@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   IonButton,
   IonGrid,
@@ -20,13 +20,13 @@ import {
 import { getDatabase, ref, set, child, push } from "firebase/database";
 import { usePhotoGallery } from "../hooks/usePhotoGallery";
 import { addOutline } from "ionicons/icons";
-
+import axios from "axios";
 function RegisterDog() {
   // INSCRIPTION
   const [name, setName] = useState<string>("");
   const [age, setAge] = useState<string>("");
   const [breed, setBreed] = useState<string>("");
-  const [profilePicture, setProfilePicture] = useState<string>("");
+  const [profilePicture, setProfilePicture] = useState<any>("");
   const [gender, setGender] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [color, setColor] = useState<string>("");
@@ -43,7 +43,8 @@ function RegisterDog() {
       today.getDate();
   const state = { userName: "Germain" };
   const { photos, takePhoto } = usePhotoGallery();
-
+  const defaultDogPicture =
+    "https://cdn.dribbble.com/users/673318/screenshots/13978786/media/5c307ab803776b5ae728e20e43d545fe.png?compress=1&resize=400x300&vertical=top";
   const writeDogData = async () => {
     await signUpRules();
     const dogData = {
@@ -51,16 +52,20 @@ function RegisterDog() {
       gender: gender,
       age: age,
       breed: breed,
-      profile_picture: photos[0].webviewPath,
+      profile_picture: photos[0] ? photos[0].filepath : defaultDogPicture,
       owner: state.userName,
       id: newDogUid,
       creation_date: current_time,
     };
     try {
       if (data) {
-        set(ref(db, "dogs/" + newDogUid), dogData).then((res) => {
-          console.log("res :>> ", res);
-        });
+        set(ref(db, "dogs/" + newDogUid), dogData)
+          .then((res) => {
+            console.log("res :>> ", res);
+          })
+          .then(() => {
+            window.location.href = "/page/HomePage";
+          });
       }
     } catch (e) {
       console.log("ERROR FROM SIGN UP DOG", e);
@@ -76,6 +81,8 @@ function RegisterDog() {
         setMessage("Tous les champs sont obligatoires");
         setShowToast(true);
         return;
+      } else {
+        setData(true);
       }
     } catch (error) {
       setColor("danger");
@@ -85,9 +92,25 @@ function RegisterDog() {
       setShowToast(true);
       return;
     }
-    return setData(true);
   }
-  console.log("photos", photos);
+
+  const uploadImage = () => {
+    const formData: any = new FormData();
+    formData.append("file", profilePicture.filepath);
+    formData.append("upload_preset", "jxvmfrwf");
+    axios({
+      method: "post",
+      url: "https://api.cloudinary.com/v1_1/dp4i4x7tk/image/upload/",
+      data: `${photos[0].webviewPath}`,
+    })
+      .then((r: any) => r.json())
+      .catch((e) => {
+        console.log("e", e);
+      });
+  };
+  useEffect(() => {
+    setProfilePicture(photos[0]);
+  }, [photos]);
 
   return (
     <IonGrid slot="sign-up" id="sign-up">
@@ -113,11 +136,17 @@ function RegisterDog() {
         <IonRow className="block-avatar ion-justify-content-center">
           <IonCol class="avatar ion-no-padding" size="auto">
             <IonAvatar>
-              <IonImg src={photos[0] ? photos[0].webviewPath : "#"} />
+              <IonImg
+                src={photos[0] ? photos[0].webviewPath : defaultDogPicture}
+              />
             </IonAvatar>
             <div className="add-avatar">
               <div>
-                <IonIcon icon={addOutline} onClick={takePhoto} />
+                <IonIcon
+                  icon={addOutline}
+                  onClick={takePhoto}
+                  onChange={(e: any) => setProfilePicture(e.target.value![0])}
+                />
               </div>
             </div>
           </IonCol>
@@ -127,14 +156,13 @@ function RegisterDog() {
             <IonCol className="ion-text-center ion-align-self-center">
               <IonButton
                 className="ion-text-center ion-align-self-center"
-                // onClick={publishPost}
+                onClick={uploadImage}
               >
                 Valider la photo
               </IonButton>
             </IonCol>
           </IonRow>
         ) : null}
-
         {/* GENDER */}
         <IonItem>
           <IonLabel color="dark">Sexe</IonLabel>
@@ -191,28 +219,12 @@ function RegisterDog() {
           </IonSelect>
         </IonItem>
 
-        {/* profile_picture */}
-        <IonItem>
-          <IonLabel color="dark">Race du chien</IonLabel>
-          <IonSelect
-            value={breed}
-            okText="OK"
-            cancelText="Fermer"
-            onIonChange={(e) => setBreed(e.detail.value!)}
-          >
-            <IonSelectOption value="Berger Australien">
-              Berger Australien
-            </IonSelectOption>
-            <IonSelectOption value="BullDog Français">
-              BullDog Français
-            </IonSelectOption>
-          </IonSelect>
-        </IonItem>
-
         <div className="ion-padding-vertical"></div>
+
         <IonButton expand="full" onClick={writeDogData} color="primary">
           Inscription
         </IonButton>
+
         <div className="ion-margin-top ion-text-center">
           <IonRouterLink class="text-xl" color="dark" href="/">
             Retour

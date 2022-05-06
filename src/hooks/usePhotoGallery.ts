@@ -18,7 +18,7 @@ export function usePhotoGallery() {
     const fileName = new Date().getTime() + ".jpeg";
     const newPhotos = [
       {
-        filepath: "assets/images/" + fileName,
+        filepath: fileName,
         webviewPath: photo.webPath,
       },
       ...photos,

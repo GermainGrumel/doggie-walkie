@@ -15,7 +15,6 @@ import {
 
 const rrfConfig = {
   userProfile: "users",
-  useFirestoreForProfile: true,
 };
 
 const rootReducer = combineReducers({

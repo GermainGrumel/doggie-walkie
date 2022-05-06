@@ -13,12 +13,19 @@ import {
   IonAvatar,
   IonTitle,
   IonRouterLink,
+  IonToast,
+  IonImg,
+  IonIcon,
+  IonLoading,
+  IonSpinner,
+  IonSearchbar,
 } from "@ionic/react";
 import React, { useEffect } from "react";
 import { useParams } from "react-router";
 import { useStore } from "react-redux";
 import { child, get, getDatabase, ref } from "firebase/database";
-import { fetchDogData } from "../realtimeDatabase/database";
+import "../styles/HomePage.scss";
+import { pawOutline } from "ionicons/icons";
 const HomePage: React.FC = () => {
   // eslint-disable-next-line
   const { name } = useParams<{ name: string }>();
@@ -28,6 +35,11 @@ const HomePage: React.FC = () => {
   const dbRef = ref(db);
   const [chosenDog, setChosenDog] = React.useState("");
   const [dogsFromDb, setDogsFromDb] = React.useState([]);
+  const [usersFromDb, setUsersFromDb] = React.useState<any[]>([]);
+  const [showToast, setShowToast] = React.useState(false);
+  const [message, setMessage] = React.useState<string>("");
+  const [color, setColor] = React.useState<string>("");
+  const [searchText, setSearchText] = React.useState("");
 
   const fetchDogData = () => {
     get(child(dbRef, `dogs`))
@@ -47,8 +59,27 @@ const HomePage: React.FC = () => {
       });
   };
 
+  const fetchUserData = () => {
+    get(child(dbRef, `users`))
+      .then((res: any) => {
+        let usersFromDB: any;
+        if (res.exists()) {
+          usersFromDB = Object.values(res.val());
+          setUsersFromDb(usersFromDB);
+          console.log("usersFromDB :>> ", usersFromDB);
+        } else {
+          console.log("No data available");
+        }
+        return usersFromDB;
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
+  };
+
   useEffect(() => {
     fetchDogData();
+    fetchUserData();
   }, []);
 
   let welcomeMsg = (
@@ -64,7 +95,7 @@ const HomePage: React.FC = () => {
         <IonCol size="auto">
           <IonText class="text-welcome">
             Content de te revoir
-            {" " + "user.username"} !
+            {" " + usersFromDb[0]?.username} !
           </IonText>
         </IonCol>
       </IonRow>
@@ -81,16 +112,36 @@ const HomePage: React.FC = () => {
   return (
     <IonContent class="page-home">
       <IonRow>{welcomeMsg}</IonRow>
-
       <IonGrid>
+        <IonToast
+          isOpen={showToast}
+          onDidDismiss={() => setShowToast(false)}
+          message={message}
+          position="top"
+          color={color}
+          duration={5000}
+          buttons={[
+            {
+              icon: "close",
+              role: "Fermer",
+              handler: () => {},
+            },
+          ]}
+        />
+        <IonSearchbar
+          placeholder="Rechercher"
+          value={searchText}
+          onIonChange={(e) => setSearchText(e.detail.value!)}
+          animated
+        ></IonSearchbar>
         <IonRow class="ion-justify-content-center">
           <IonCol size="auto">
-            <IonItem href="/page/WalkMyDog" detail={true} lines="none">
-              <IonButton>Faire promener mon chien</IonButton>
-            </IonItem>
-            <IonItem href="/page/WalkSomeoneDog" detail={true} lines="none">
-              <IonButton>Promener le chien de quelqu'un</IonButton>
-            </IonItem>
+            <IonButton href="/page/WalkMyDog">
+              Faire promener mon chien
+            </IonButton>
+            <IonButton href="/page/WalkSomeoneDog">
+              Promener le chien de quelqu'un
+            </IonButton>
           </IonCol>
         </IonRow>
 
@@ -100,30 +151,72 @@ const HomePage: React.FC = () => {
           </IonCol>
         </IonRow>
 
+        <IonRow class="ion-align-items-center title-details">
+          <IonCol className="ion-align-items-center ion-text-center">
+            <IonIcon icon={pawOutline} className="paw-icon"></IonIcon>
+            <span className="text-custom ion-justify-items-center">
+              {dogsFromDb.length} chiens disponibles
+            </span>
+          </IonCol>
+        </IonRow>
         <IonRow>
-          {dogsFromDb.map((dog: any) => (
-            <IonCol size="6" key={dog.id}>
-              <IonRouterLink
-                color="light"
-                onClick={() => setChosenDog(dog)}
+          <IonCol class="items-overflow">
+            {dogsFromDb.map((dog: any) => (
+              <IonCard
                 href={`page/WalkSomeoneDogConfirm/${dog.id}`}
+                key={dog.id}
+                onClick={() => setChosenDog(dog)}
               >
-                <IonCard>
-                  <IonCardHeader>
-                    <IonAvatar>
-                      <img src={dog.profile_picture} alt="dog profile" />
-                    </IonAvatar>
-                    <div>
-                      <IonCardTitle style={{ fontSize: "20px" }}>
-                        {dog.dogName}, {dog.age} an
-                      </IonCardTitle>
-                      <IonCardSubtitle>6km </IonCardSubtitle>
-                    </div>
-                  </IonCardHeader>
-                </IonCard>
-              </IonRouterLink>
-            </IonCol>
-          ))}
+                <IonImg src={dog.profile_picture} />
+                <IonCardHeader>
+                  <IonCardSubtitle>
+                    {dog.dogName} : {dog.age} an
+                  </IonCardSubtitle>
+                </IonCardHeader>
+              </IonCard>
+            ))}{" "}
+          </IonCol>
+        </IonRow>
+        <IonRow class="ion-align-items-center">
+          <IonCol className="ion-align-items-center ion-text-center">
+            <IonButton href="/page/WalkSomeoneDog">
+              Voir tous les chiens
+            </IonButton>
+          </IonCol>
+        </IonRow>
+        <IonRow class="ion-align-items-center ion-text-center ion-padding-top">
+          <IonCol>
+            <IonTitle>Tu n'as pas encore inscris ton chien ?</IonTitle>
+          </IonCol>
+          <IonCol size="8">
+            <IonText class="ion-padding">
+              Rejoins la communauté de DogWalker et fais en sorte que ton
+              compagnon canin puisse être promené aussi longtemps et autant de
+              fois que nécessaire !{" "}
+            </IonText>
+          </IonCol>
+          <IonCol size="4">
+            <IonRow class="ion-padding">
+              {" "}
+              <IonAvatar>
+                <IonImg src="https://img2.10bestmedia.com/Images/Photos/379272/GettyImages-104489865_54_990x660.jpg" />
+              </IonAvatar>
+              <IonAvatar>
+                <IonImg src="https://img2.10bestmedia.com/Images/Photos/379272/GettyImages-104489865_54_990x660.jpg" />
+              </IonAvatar>
+              <IonAvatar>
+                <IonImg src="https://img2.10bestmedia.com/Images/Photos/379272/GettyImages-104489865_54_990x660.jpg" />
+              </IonAvatar>
+              <IonAvatar>
+                <IonImg src="https://img2.10bestmedia.com/Images/Photos/379272/GettyImages-104489865_54_990x660.jpg" />
+              </IonAvatar>
+            </IonRow>
+          </IonCol>
+        </IonRow>
+        <IonRow class="ion-align-items-center ion-text-center ion-padding-top ion-justify-content-center">
+          <IonCol class="ion-align-items-center ion-text-center">
+            <IonButton href="/page/RegisterDog">Inscris ton chien !</IonButton>
+          </IonCol>
         </IonRow>
       </IonGrid>
     </IonContent>

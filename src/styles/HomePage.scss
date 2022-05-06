@@ -1,0 +1,22 @@
+.items-overflow {
+    display: grid;
+    grid-template-columns: repeat(100, 1fr);
+    row-gap: 50px;
+    grid-auto-rows: minmax(50px, auto);
+    justify-items: center;
+    overflow-y: scroll;
+    & ion-card {
+      margin: 0 5px;
+      width: 250px;
+      & ion-img {
+        object-fit: cover;
+        height: 150px;
+      }
+    }
+  }
+  ion-icon.camera-icon {
+    font-size: 24px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+  }

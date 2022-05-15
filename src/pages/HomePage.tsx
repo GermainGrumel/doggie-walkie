@@ -24,8 +24,9 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router";
 import { useStore } from "react-redux";
 import { child, get, getDatabase, ref } from "firebase/database";
+import { getStorage, uploadBytes, ref as sRef } from "firebase/storage";
 import "../styles/HomePage.scss";
-import { pawOutline } from "ionicons/icons";
+import { pawOutline, arrowForwardOutline, starOutline } from "ionicons/icons";
 const HomePage: React.FC = () => {
   // eslint-disable-next-line
   const { name } = useParams<{ name: string }>();
@@ -40,6 +41,7 @@ const HomePage: React.FC = () => {
   const [message, setMessage] = React.useState<string>("");
   const [color, setColor] = React.useState<string>("");
   const [searchText, setSearchText] = React.useState("");
+  const [showLoading, setShowLoading] = React.useState(true);
 
   const fetchDogData = () => {
     get(child(dbRef, `dogs`))
@@ -82,143 +84,191 @@ const HomePage: React.FC = () => {
     fetchUserData();
   }, []);
 
+  console.log("usersFromDB :>> ", usersFromDb);
   let welcomeMsg = (
-    <IonCol class="slider ion-text-center">
+    <IonCol
+      style={{
+        background:
+          "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(22,56,63,1) 39%, rgba(121,68,9,1) 76%)",
+      }}
+      class="slider ion-text-center"
+    >
       {/* <IonImg className="logo" src="assets/tmp/logo-only.svg" /> */}
-      <IonText class="ion-text-uppercase" color="primary">
-        DogWalker
-      </IonText>
-      <IonRow class="ion-justify-content-center">
-        {/* <IonCol size="auto">
-          <IonImg class="waving-hand" src="assets/tmp/waving_hand.svg" />
-        </IonCol> */}
-        <IonCol size="auto">
-          <IonText class="text-welcome">
-            Content de te revoir
-            {" " + usersFromDb[0]?.username} !
+      <IonRow>
+        <IonCol
+          style={{ display: "flex" }}
+          class="ion-justify-content-center ion-align-items-center"
+        >
+          <IonText
+            style={{ fontSize: "24px" }}
+            class="ion-text-uppercase"
+            color="primary"
+          >
+            DogWalker
           </IonText>
+          <IonImg
+            style={{ width: "100px" }}
+            src="assets/images/dog-waving.png"
+          />
         </IonCol>
       </IonRow>
-      <IonRow class="ion-justify-content-center">
-        <IonCol size="auto">
-          <IonText>
-            Tu veux faire promener ton chien ou en promener un ?
-          </IonText>
-        </IonCol>
-      </IonRow>
+
+      <IonCol size="auto"></IonCol>
+
+      <IonCol size="auto">
+        <IonText style={{ color: "white" }} class="text-welcome">
+          Content de te revoir
+          {" " + usersFromDb[0]?.username} !
+        </IonText>
+      </IonCol>
+      <IonSearchbar
+        color="light"
+        placeholder="Rechercher"
+        value={searchText}
+        onIonChange={(e) => setSearchText(e.detail.value!)}
+        animated
+      ></IonSearchbar>
     </IonCol>
   );
+  console.log(chosenDog);
 
   return (
     <IonContent class="page-home">
-      <IonRow>{welcomeMsg}</IonRow>
-      <IonGrid>
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message={message}
-          position="top"
-          color={color}
-          duration={5000}
-          buttons={[
-            {
-              icon: "close",
-              role: "Fermer",
-              handler: () => {},
-            },
-          ]}
-        />
-        <IonSearchbar
-          placeholder="Rechercher"
-          value={searchText}
-          onIonChange={(e) => setSearchText(e.detail.value!)}
-          animated
-        ></IonSearchbar>
-        <IonRow class="ion-justify-content-center">
-          <IonCol size="auto">
-            <IonButton href="/page/WalkMyDog">
-              Faire promener mon chien
-            </IonButton>
-            <IonButton href="/page/WalkSomeoneDog">
-              Promener le chien de quelqu'un
-            </IonButton>
-          </IonCol>
-        </IonRow>
+      {usersFromDb[0] ? (
+        <>
+          {" "}
+          <IonRow>{welcomeMsg}</IonRow>
+          <IonGrid>
+            <IonToast
+              isOpen={showToast}
+              onDidDismiss={() => setShowToast(false)}
+              message={message}
+              position="top"
+              color={color}
+              duration={5000}
+              buttons={[
+                {
+                  icon: "close",
+                  role: "Fermer",
+                  handler: () => {},
+                },
+              ]}
+            />
 
-        <IonRow class="ion-justify-content-center">
-          <IonCol size="auto">
-            <IonTitle>Trouver un chien à proximité</IonTitle>
-          </IonCol>
-        </IonRow>
-
-        <IonRow class="ion-align-items-center title-details">
-          <IonCol className="ion-align-items-center ion-text-center">
-            <IonIcon icon={pawOutline} className="paw-icon"></IonIcon>
-            <span className="text-custom ion-justify-items-center">
-              {dogsFromDb.length} chiens disponibles
-            </span>
-          </IonCol>
-        </IonRow>
-        <IonRow>
-          <IonCol class="items-overflow">
-            {dogsFromDb.map((dog: any) => (
-              <IonCard
-                href={`page/WalkSomeoneDogConfirm/${dog.id}`}
-                key={dog.id}
-                onClick={() => setChosenDog(dog)}
-              >
-                <IonImg src={dog.profile_picture} />
-                <IonCardHeader>
-                  <IonCardSubtitle>
-                    {dog.dogName} : {dog.age} an
-                  </IonCardSubtitle>
-                </IonCardHeader>
-              </IonCard>
-            ))}{" "}
-          </IonCol>
-        </IonRow>
-        <IonRow class="ion-align-items-center">
-          <IonCol className="ion-align-items-center ion-text-center">
-            <IonButton href="/page/WalkSomeoneDog">
-              Voir tous les chiens
-            </IonButton>
-          </IonCol>
-        </IonRow>
-        <IonRow class="ion-align-items-center ion-text-center ion-padding-top">
-          <IonCol>
-            <IonTitle>Tu n'as pas encore inscris ton chien ?</IonTitle>
-          </IonCol>
-          <IonCol size="8">
-            <IonText class="ion-padding">
-              Rejoins la communauté de DogWalker et fais en sorte que ton
-              compagnon canin puisse être promené aussi longtemps et autant de
-              fois que nécessaire !{" "}
-            </IonText>
-          </IonCol>
-          <IonCol size="4">
-            <IonRow class="ion-padding">
-              {" "}
-              <IonAvatar>
-                <IonImg src="https://img2.10bestmedia.com/Images/Photos/379272/GettyImages-104489865_54_990x660.jpg" />
-              </IonAvatar>
-              <IonAvatar>
-                <IonImg src="https://img2.10bestmedia.com/Images/Photos/379272/GettyImages-104489865_54_990x660.jpg" />
-              </IonAvatar>
-              <IonAvatar>
-                <IonImg src="https://img2.10bestmedia.com/Images/Photos/379272/GettyImages-104489865_54_990x660.jpg" />
-              </IonAvatar>
-              <IonAvatar>
-                <IonImg src="https://img2.10bestmedia.com/Images/Photos/379272/GettyImages-104489865_54_990x660.jpg" />
-              </IonAvatar>
+            <IonRow class="ion-padding-top ionic-padding-bottom">
+              <IonButton href="/page/WalkMyDog">
+                Faire promener mon chien
+              </IonButton>
+              <IonButton href="/page/WalkSomeoneDog">
+                Promener le chien de quelqu'un
+              </IonButton>
             </IonRow>
-          </IonCol>
-        </IonRow>
-        <IonRow class="ion-align-items-center ion-text-center ion-padding-top ion-justify-content-center">
-          <IonCol class="ion-align-items-center ion-text-center">
-            <IonButton href="/page/RegisterDog">Inscris ton chien !</IonButton>
-          </IonCol>
-        </IonRow>
-      </IonGrid>
+
+            <IonRow class="ion-justify-content-center">
+              <IonCol size="auto">
+                <IonTitle>Trouver un chien à proximité</IonTitle>
+              </IonCol>
+            </IonRow>
+
+            <IonRow class="ion-align-items-center title-details">
+              <IonCol
+                style={{ display: "flex" }}
+                className="ion-align-items-center ion-justify-content-around ion-text-center"
+              >
+                <div>
+                  <IonIcon icon={pawOutline} className="paw-icon"></IonIcon>
+                  <span className="text-custom ion-justify-items-center">
+                    {dogsFromDb.length} chiens disponibles
+                  </span>
+                </div>
+                <div>
+                  <a href="/page/WalkSomeoneDog">
+                    <IonText class="text-custom" color="primary">
+                      Voir plus
+                    </IonText>
+                    <IonIcon
+                      icon={arrowForwardOutline}
+                      color="primary"
+                      style={{ verticalAlign: "middle", marginLeft: "5px" }}
+                    ></IonIcon>
+                  </a>
+                </div>
+              </IonCol>
+            </IonRow>
+            <IonRow>
+              <IonCol class="items-overflow">
+                {dogsFromDb.map((dog: any) => (
+                  <IonCard
+                    href={`page/WalkSomeoneDogConfirm/${dog.id}`}
+                    key={dog.id}
+                    onClick={() => setChosenDog(dog)}
+                    class="ion-align-items-center ion-text-center"
+                  >
+                    <IonImg
+                      style={{ objectFit: "cover", height: "100px" }}
+                      src={`https://firebasestorage.googleapis.com/v0/b/dogwalkdev.appspot.com/o/dogs%2F${dog.profile_picture}?alt=media&token=3a344a22-004d-472b-8f7b-813e40c8d7af`}
+                    />
+                    <IonCardHeader>
+                      <IonCardSubtitle>
+                        {dog.dogName} :{" "}
+                        {dog.age > 1 ? `${dog.age} ans` : `${dog.age} an`}
+                      </IonCardSubtitle>
+                    </IonCardHeader>
+                  </IonCard>
+                ))}
+              </IonCol>
+            </IonRow>
+
+            <IonRow class="ion-align-items-center ion-padding-top">
+              <IonCol style={{ marginLeft: "25px" }}>
+                <div>
+                  <IonIcon icon={starOutline} className="paw-icon"></IonIcon>
+                  <span className="text-custom">
+                    Mes 5 dernières promenades
+                  </span>
+                </div>
+              </IonCol>
+            </IonRow>
+
+            <IonRow>
+              <IonCol class="items-aligned">
+                {dogsFromDb.map((dog: any) => (
+                  <>
+                    <IonCard className="last-walks">
+                      <IonAvatar>
+                        <IonImg
+                          src={`https://firebasestorage.googleapis.com/v0/b/dogwalkdev.appspot.com/o/dogs%2F${dog.profile_picture}?alt=media&token=3a344a22-004d-472b-8f7b-813e40c8d7af`}
+                        ></IonImg>
+                      </IonAvatar>
+                      <div className="name-and-age">
+                        <IonText>
+                          {dog.dogName} : {""}
+                          {dog.age > 1 ? `${dog.age} ans` : `${dog.age} an`}
+                        </IonText>
+                        <br />
+                        <IonText>12 minutes</IonText>
+                      </div>
+                      <IonText color="primary">
+                        {dog.creation_date} <br />
+                        <span className="ion-text-end">
+                          <b>12€</b>
+                        </span>
+                      </IonText>
+                    </IonCard>
+                  </>
+                ))}
+              </IonCol>
+            </IonRow>
+          </IonGrid>{" "}
+        </>
+      ) : (
+        <IonLoading
+          isOpen={showLoading}
+          onDidDismiss={() => setShowLoading(false)}
+          message={"Chargement en cours..."}
+          duration={5000}
+        />
+      )}
     </IonContent>
   );
 };

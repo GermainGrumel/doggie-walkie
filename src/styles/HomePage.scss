@@ -6,17 +6,39 @@
     justify-items: center;
     overflow-y: scroll;
     & ion-card {
-      margin: 0 5px;
-      width: 250px;
-      & ion-img {
-        object-fit: cover;
-        height: 150px;
-      }
+      margin: 0 10px;
+      width: 150px;
     }
   }
-  ion-icon.camera-icon {
+  ion-icon.paw-icon {
     font-size: 24px;
     display: inline-block;
     vertical-align: middle;
     margin-right: 10px;
+  }
+.text-custom{
+  vertical-align: middle;
+  font-weight: 600;
+}
+
+  ion-searchbar{
+    input{
+      padding-left: 50px !important;
+    }
+  }
+
+  ion-button{
+    width: 180px;
+    font-size:12px
+  }
+
+  .last-walks{
+    display: flex;
+    justify-content: space-around;
+    .name-and-age{
+      font-size: 16px;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+  
   }

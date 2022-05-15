@@ -20,7 +20,12 @@ import {
 import { getDatabase, ref, set, child, push } from "firebase/database";
 import { usePhotoGallery } from "../hooks/usePhotoGallery";
 import { addOutline } from "ionicons/icons";
-import axios from "axios";
+import {
+  getStorage,
+  uploadBytes,
+  ref as sRef,
+  uploadString,
+} from "firebase/storage";
 function RegisterDog() {
   // INSCRIPTION
   const [name, setName] = useState<string>("");
@@ -45,6 +50,7 @@ function RegisterDog() {
   const { photos, takePhoto } = usePhotoGallery();
   const defaultDogPicture =
     "https://cdn.dribbble.com/users/673318/screenshots/13978786/media/5c307ab803776b5ae728e20e43d545fe.png?compress=1&resize=400x300&vertical=top";
+
   const writeDogData = async () => {
     await signUpRules();
     const dogData = {
@@ -59,13 +65,9 @@ function RegisterDog() {
     };
     try {
       if (data) {
-        set(ref(db, "dogs/" + newDogUid), dogData)
-          .then((res) => {
-            console.log("res :>> ", res);
-          })
-          .then(() => {
-            window.location.href = "/page/HomePage";
-          });
+        set(ref(db, "dogs/" + newDogUid), dogData).then(() => {
+          window.location.href = "/page/HomePage";
+        });
       }
     } catch (e) {
       console.log("ERROR FROM SIGN UP DOG", e);
@@ -95,18 +97,16 @@ function RegisterDog() {
   }
 
   const uploadImage = () => {
-    const formData: any = new FormData();
-    formData.append("file", profilePicture.filepath);
-    formData.append("upload_preset", "jxvmfrwf");
-    axios({
-      method: "post",
-      url: "https://api.cloudinary.com/v1_1/dp4i4x7tk/image/upload/",
-      data: `${photos[0].webviewPath}`,
-    })
-      .then((r: any) => r.json())
-      .catch((e) => {
-        console.log("e", e);
-      });
+    console.log(profilePicture);
+
+    const storage: any = getStorage();
+    const storageRef: any = sRef(storage, `dogs/${profilePicture.filepath}`);
+    uploadString(storageRef, profilePicture.webviewPath, "data_url").then(
+      (snapshot) => {
+        console.log("Uploaded a data_url string!");
+        console.log("snapshot :>> ", snapshot.ref);
+      }
+    );
   };
   useEffect(() => {
     setProfilePicture(photos[0]);
@@ -145,7 +145,7 @@ function RegisterDog() {
                 <IonIcon
                   icon={addOutline}
                   onClick={takePhoto}
-                  onChange={(e: any) => setProfilePicture(e.target.value![0])}
+                  onChange={(e: any) => setProfilePicture(e.target.value[0])}
                 />
               </div>
             </div>

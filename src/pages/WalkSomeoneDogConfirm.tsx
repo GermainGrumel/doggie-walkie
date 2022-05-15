@@ -9,11 +9,23 @@ import {
   IonButton,
   IonImg,
   IonBackButton,
+  IonLoading,
   IonToast,
 } from "@ionic/react";
 import { useDispatch, useStore } from "react-redux";
 import { useParams } from "react-router";
 import { child, get, getDatabase, ref } from "firebase/database";
+
+type Dog = {
+  age: string;
+  breed: string;
+  creation_date: string;
+  dogName: string;
+  gender: string;
+  id: string;
+  owner: string;
+  profile_picture: any;
+};
 function WalkSomeoneDogConfirm() {
   const { id } = useParams<{ id: string }>();
   const { name } = useParams<{ name: string }>();
@@ -22,31 +34,30 @@ function WalkSomeoneDogConfirm() {
   const db = getDatabase();
   const dbRef = ref(db);
   const dispatch = useDispatch();
-  const [chosenDog, setChosenDog] = React.useState("");
+  const [currentDog, setCurrentDog] = React.useState<Dog>();
   const [dogsFromDb, setDogsFromDb] = React.useState([]);
   const [showToast, setShowToast] = React.useState(false);
   const [message, setMessage] = React.useState<string>("");
   const [color, setColor] = React.useState<string>("");
+  const [showLoading, setShowLoading] = React.useState(true);
 
-  const fetchDogData = () => {
-    get(child(dbRef, `dogs`))
-      .then((res: any) => {
-        let dogsFromDB: any;
-        if (res.exists()) {
-          dogsFromDB = Object.values(res.val()) as never[];
-          dispatch({ type: "SET_USER", payload: dogsFromDB });
-          setDogsFromDb(dogsFromDB);
-          console.log("dogsFromDB :>> ", dogsFromDB);
-        } else {
-          console.log("No data available");
-        }
-        return dogsFromDB;
-      })
-      .catch((error: any) => {
-        console.error(error);
-      });
+  const fetchDogData = async () => {
+    try {
+      const response = await get(child(dbRef, `dogs`));
+      if (!response.exists()) return;
+      const dogs: Dog[] = Object.values(response.val());
+      const dog = dogs.find((element) => element.id === id);
+      if (!dog) return;
+      setCurrentDog(dog);
+      // for (const dog of dogs) {
+      //   if (dog.id !== id) continue;
+      //   setCurrentDog(dog);
+      //   break;
+      // }
+    } catch (error) {
+      console.error(error);
+    }
   };
-
   useEffect(() => {
     fetchDogData();
   }, []);
@@ -58,62 +69,74 @@ function WalkSomeoneDogConfirm() {
   };
   return (
     <IonContent>
-      <IonGrid>
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message={message}
-          position="middle"
-          color={color}
-          duration={5000}
-          buttons={[
-            {
-              icon: "close",
-              role: "Fermer",
-              handler: () => {},
-            },
-          ]}
+      {currentDog ? (
+        <IonGrid>
+          <IonToast
+            isOpen={showToast}
+            onDidDismiss={() => setShowToast(false)}
+            message={message}
+            position="middle"
+            color={color}
+            duration={5000}
+            buttons={[
+              {
+                icon: "close",
+                role: "Fermer",
+                handler: () => {},
+              },
+            ]}
+          />
+          <IonRow class="ion-justify-content-center ion-text-center">
+            <IonCol>
+              <IonText>Vous souhaitez promener {currentDog.dogName}?</IonText>
+            </IonCol>
+          </IonRow>
+
+          <IonRow class="ion-justify-content-center ion-text-center">
+            <IonCol>
+              <IonText class="text-md">
+                dog name se situe à 6km de vous !
+              </IonText>
+            </IonCol>
+          </IonRow>
+
+          <IonRow class="ion-justify-content-center ion-text-center">
+            <IonCol>
+              <IonImg
+                style={{ height: "200px" }}
+                src={currentDog.profile_picture}
+              />
+            </IonCol>
+          </IonRow>
+
+          <IonRow class="ion-justify-content-center ion-text-center">
+            <IonCol>
+              <IonText class="text-md">
+                Vous pouvez aller chercher {currentDog.dogName} chez{" "}
+                {currentDog.owner} à 14h15 !
+              </IonText>
+            </IonCol>
+          </IonRow>
+
+          <IonRow class="ion-justify-content-center ion-text-center">
+            <IonCol>
+              <IonButton
+                onClick={attributeDog}
+                color="primary"
+                href="page/HomePage"
+              >
+                Valider l'action
+              </IonButton>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
+      ) : (
+        <IonLoading
+          isOpen={showLoading}
+          onDidDismiss={() => setShowLoading(false)}
+          message={"Chargement en cours..."}
         />
-        <IonBackButton>a</IonBackButton>
-        <IonRow class="ion-justify-content-center ion-text-center">
-          <IonCol>
-            <IonTitle>Vous souhaitez promener dog name ?</IonTitle>
-          </IonCol>
-        </IonRow>
-
-        <IonRow class="ion-justify-content-center ion-text-center">
-          <IonCol>
-            <IonText class="text-md">dog name se situe à 6km de vous !</IonText>
-          </IonCol>
-        </IonRow>
-
-        <IonRow class="ion-justify-content-center ion-text-center">
-          <IonCol>
-            <IonImg style={{ height: "200px" }} src="assets/images/dog.jpeg" />
-          </IonCol>
-        </IonRow>
-
-        <IonRow class="ion-justify-content-center ion-text-center">
-          <IonCol>
-            <IonText class="text-md">
-              Vous pouvez aller chercher dog name chez owner name à
-              timetSetByOwner !
-            </IonText>
-          </IonCol>
-        </IonRow>
-
-        <IonRow class="ion-justify-content-center ion-text-center">
-          <IonCol>
-            <IonButton
-              onClick={attributeDog}
-              color="primary"
-              href="page/HomePage"
-            >
-              Valider l'action
-            </IonButton>
-          </IonCol>
-        </IonRow>
-      </IonGrid>
+      )}
     </IonContent>
   );
 }

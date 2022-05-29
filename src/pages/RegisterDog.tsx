@@ -15,9 +15,11 @@ import {
   IonAvatar,
   IonImg,
   IonIcon,
+  IonSearchbar,
+  IonLoading,
 } from "@ionic/react";
 
-import { getDatabase, ref, set, child, push } from "firebase/database";
+import { getDatabase, ref, set, child, push, get } from "firebase/database";
 import { usePhotoGallery } from "../hooks/usePhotoGallery";
 import { addOutline } from "ionicons/icons";
 import {
@@ -26,6 +28,9 @@ import {
   ref as sRef,
   uploadString,
 } from "firebase/storage";
+import { dogBreeds } from "../realtimeDatabase/database";
+import { fetchUsersData, findCurrentUser } from "../utils/utils";
+import { useSelector } from "react-redux";
 function RegisterDog() {
   // INSCRIPTION
   const [name, setName] = useState<string>("");
@@ -37,8 +42,15 @@ function RegisterDog() {
   const [color, setColor] = useState<string>("");
   const [showToast, setShowToast] = useState(false);
   const [data, setData] = useState(false);
+  const [users, setUsers] = React.useState<any[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>({});
+  const [showLoading, setShowLoading] = useState(true);
+
   const db = getDatabase();
+  const dbRef = ref(db);
   const newDogUid = push(child(ref(db), "dogs")).key;
+  const state = useSelector((state: any) => state);
+
   const today = new Date(),
     current_time =
       today.getFullYear() +
@@ -46,10 +58,25 @@ function RegisterDog() {
       (today.getMonth() + 1) +
       "-" +
       today.getDate();
-  const state = { userName: "Germain" };
   const { photos, takePhoto } = usePhotoGallery();
   const defaultDogPicture =
     "https://cdn.dribbble.com/users/673318/screenshots/13978786/media/5c307ab803776b5ae728e20e43d545fe.png?compress=1&resize=400x300&vertical=top";
+
+  const getUsersData = async () => {
+    const usersFromDatabase = await fetchUsersData(dbRef);
+    setUsers(usersFromDatabase);
+  };
+
+  const getCurrentUser = async () => {
+    const loggedUser = findCurrentUser(users, state);
+    setCurrentUser(loggedUser);
+  };
+  useEffect(() => {
+    getUsersData();
+  }, [showLoading]);
+  useEffect(() => {
+    getCurrentUser();
+  }, [users]);
 
   const writeDogData = async () => {
     await signUpRules();
@@ -59,8 +86,10 @@ function RegisterDog() {
       age: age,
       breed: breed,
       profile_picture: photos[0] ? photos[0].filepath : defaultDogPicture,
-      owner: state.userName,
+      owner_id: currentUser.id,
       id: newDogUid,
+      available_at: "",
+      description: "",
       creation_date: current_time,
     };
     try {
@@ -114,123 +143,143 @@ function RegisterDog() {
 
   return (
     <IonGrid slot="sign-up" id="sign-up">
-      <IonToast
-        isOpen={showToast}
-        onDidDismiss={() => setShowToast(false)}
-        message={message}
-        position="middle"
-        color={color}
-        duration={5000}
-        buttons={[
-          {
-            icon: "close",
-            role: "Fermer",
-            handler: () => {},
-          },
-        ]}
-      />
-      <div className="block-register">
-        <div className="register-mandatory ion-text-center">
-          <IonText>Tous les champs sont obligatoires</IonText>
-        </div>
-        <IonRow className="block-avatar ion-justify-content-center">
-          <IonCol class="avatar ion-no-padding" size="auto">
-            <IonAvatar>
-              <IonImg
-                src={photos[0] ? photos[0].webviewPath : defaultDogPicture}
-              />
-            </IonAvatar>
-            <div className="add-avatar">
-              <div>
-                <IonIcon
-                  icon={addOutline}
-                  onClick={takePhoto}
-                  onChange={(e: any) => setProfilePicture(e.target.value[0])}
-                />
-              </div>
+      {users[0] && currentUser?.id ? (
+        <>
+          <IonToast
+            isOpen={showToast}
+            onDidDismiss={() => setShowToast(false)}
+            message={message}
+            position="middle"
+            color={color}
+            duration={5000}
+            buttons={[
+              {
+                icon: "close",
+                role: "Fermer",
+                handler: () => {},
+              },
+            ]}
+          />
+          <div className="block-register">
+            <div className="register-mandatory ion-text-center">
+              <IonText>Tous les champs sont obligatoires</IonText>
             </div>
-          </IonCol>
-        </IonRow>
-        {photos[0] ? (
-          <IonRow className="ion-text-center ion-align-self-center">
-            <IonCol className="ion-text-center ion-align-self-center">
-              <IonButton
-                className="ion-text-center ion-align-self-center"
-                onClick={uploadImage}
+            <IonRow className="block-avatar ion-justify-content-center">
+              <IonCol class="avatar ion-no-padding" size="auto">
+                <IonAvatar>
+                  <IonImg
+                    src={photos[0] ? photos[0].webviewPath : defaultDogPicture}
+                  />
+                </IonAvatar>
+                <div className="add-avatar">
+                  <div>
+                    <IonIcon
+                      icon={addOutline}
+                      onClick={takePhoto}
+                      onChange={(e: any) =>
+                        setProfilePicture(e.target.value[0])
+                      }
+                    />
+                  </div>
+                </div>
+              </IonCol>
+            </IonRow>
+            {photos[0] ? (
+              <IonRow className="ion-text-center ion-align-self-center">
+                <IonCol className="ion-text-center ion-align-self-center">
+                  <IonButton
+                    className="ion-text-center ion-align-self-center"
+                    onClick={uploadImage}
+                  >
+                    Valider la photo
+                  </IonButton>
+                </IonCol>
+              </IonRow>
+            ) : null}
+            {/* GENDER */}
+            <IonItem>
+              <IonLabel color="dark">Sexe</IonLabel>
+              <IonSelect
+                value={gender}
+                okText="OK"
+                cancelText="Fermer"
+                onIonChange={(e) => setGender(e.detail.value!)}
               >
-                Valider la photo
-              </IonButton>
-            </IonCol>
-          </IonRow>
-        ) : null}
-        {/* GENDER */}
-        <IonItem>
-          <IonLabel color="dark">Sexe</IonLabel>
-          <IonSelect
-            value={gender}
-            okText="OK"
-            cancelText="Fermer"
-            onIonChange={(e) => setGender(e.detail.value!)}
-          >
-            <IonSelectOption value="male">Mâle</IonSelectOption>
-            <IonSelectOption value="femelle">Femelle</IonSelectOption>
-          </IonSelect>
-        </IonItem>
+                <IonSelectOption value="male">Mâle</IonSelectOption>
+                <IonSelectOption value="femelle">Femelle</IonSelectOption>
+              </IonSelect>
+            </IonItem>
 
-        {/* PRENOM */}
-        <IonItem>
-          <IonLabel position="floating" color="dark">
-            Prénom :
-          </IonLabel>
-          <IonInput
-            type="text"
-            value={name}
-            placeholder="Ex :Your name"
-            onIonChange={(e) => setName(e.detail.value!)}
-          ></IonInput>
-        </IonItem>
-        {/* AGE */}
-        <IonItem>
-          <IonLabel position="floating" color="dark">
-            Age :
-          </IonLabel>
-          <IonInput
-            type="number"
-            value={age}
-            placeholder="Ex : Age of the dog"
-            onIonChange={(e) => setAge(e.detail.value!)}
-          ></IonInput>
-        </IonItem>
-        {/* BREED */}
-        <IonItem>
-          <IonLabel color="dark">Race du chien</IonLabel>
-          <IonSelect
-            value={breed}
-            okText="OK"
-            cancelText="Fermer"
-            onIonChange={(e) => setBreed(e.detail.value!)}
-          >
-            <IonSelectOption value="Berger Australien">
-              Berger Australien
-            </IonSelectOption>
-            <IonSelectOption value="BullDog Français">
-              BullDog Français
-            </IonSelectOption>
-          </IonSelect>
-        </IonItem>
+            {/* PRENOM */}
+            <IonItem>
+              <IonLabel position="floating" color="dark">
+                Prénom :
+              </IonLabel>
+              <IonInput
+                type="text"
+                value={name}
+                placeholder="Ex :Your name"
+                onIonChange={(e) => setName(e.detail.value!)}
+              ></IonInput>
+            </IonItem>
+            {/* AGE */}
+            <IonItem>
+              <IonLabel position="floating" color="dark">
+                Age :
+              </IonLabel>
+              <IonInput
+                type="number"
+                value={age}
+                placeholder="Ex : Age of the dog"
+                onIonChange={(e) => setAge(e.detail.value!)}
+              ></IonInput>
+            </IonItem>
+            {/* BREED */}
+            <IonItem>
+              <IonLabel color="dark">Race du chien</IonLabel>
 
-        <div className="ion-padding-vertical"></div>
+              <IonSelect
+                value={breed}
+                okText="OK"
+                cancelText="Fermer"
+                onIonChange={(e) => setBreed(e.detail.value!)}
+              >
+                {dogBreeds.map((dogBreed, index) => {
+                  return (
+                    <>
+                      <IonSelectOption key={index} value={dogBreed}>
+                        {dogBreed}
+                      </IonSelectOption>
+                      ;
+                    </>
+                  );
+                })}
+              </IonSelect>
+            </IonItem>
 
-        <IonButton expand="full" onClick={writeDogData} color="primary">
-          Inscription
-        </IonButton>
+            <div className="ion-padding-vertical"></div>
 
-        <div className="ion-margin-top ion-text-center">
-          <IonRouterLink class="text-xl" color="dark" href="/">
-            Retour
-          </IonRouterLink>
-        </div>
-      </div>
+            <IonButton expand="full" onClick={writeDogData} color="primary">
+              Inscription
+            </IonButton>
+
+            <div className="ion-margin-top ion-text-center">
+              <IonRouterLink class="text-xl" color="dark" href="/">
+                Retour
+              </IonRouterLink>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          <IonLoading
+            isOpen={showLoading}
+            onDidDismiss={() => setShowLoading(false)}
+            message={"Chargement en cours..."}
+            duration={5000}
+          />
+        </>
+      )}
     </IonGrid>
   );
 }

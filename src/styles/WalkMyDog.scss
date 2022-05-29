@@ -1,0 +1,14 @@
+.walkSomeoneDog{
+  background-color: #FBEEEB;
+}
+.avatar-overflow{
+  display: grid;
+    grid-template-columns: repeat(100, 1fr);
+    row-gap: 50px;
+    grid-auto-rows: minmax(50px, auto);
+    justify-items: center;
+    overflow-y: scroll;
+& ion-avatar {
+      margin: 0 10px;
+    }
+}

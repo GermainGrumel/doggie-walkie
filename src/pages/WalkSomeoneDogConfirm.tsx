@@ -25,6 +25,7 @@ type Dog = {
   id: string;
   owner: string;
   profile_picture: any;
+  available_at: string;
 };
 function WalkSomeoneDogConfirm() {
   const { id } = useParams<{ id: string }>();
@@ -41,7 +42,7 @@ function WalkSomeoneDogConfirm() {
   const [color, setColor] = React.useState<string>("");
   const [showLoading, setShowLoading] = React.useState(true);
 
-  const fetchDogData = async () => {
+  const fetchCurrentDogData = async () => {
     try {
       const response = await get(child(dbRef, `dogs`));
       if (!response.exists()) return;
@@ -49,22 +50,20 @@ function WalkSomeoneDogConfirm() {
       const dog = dogs.find((element) => element.id === id);
       if (!dog) return;
       setCurrentDog(dog);
-      // for (const dog of dogs) {
-      //   if (dog.id !== id) continue;
-      //   setCurrentDog(dog);
-      //   break;
-      // }
     } catch (error) {
       console.error(error);
     }
   };
   useEffect(() => {
-    fetchDogData();
+    fetchCurrentDogData();
   }, []);
+  console.log(currentDog);
 
   const attributeDog = () => {
     setColor("success");
-    setMessage("Vous pouvez aller chercher dog.name dans 10 mins");
+    setMessage(
+      `Vous pouvez aller chercher ${currentDog?.dogName} dans 10 mins`
+    );
     setShowToast(true);
   };
   return (
@@ -95,7 +94,7 @@ function WalkSomeoneDogConfirm() {
           <IonRow class="ion-justify-content-center ion-text-center">
             <IonCol>
               <IonText class="text-md">
-                dog name se situe à 6km de vous !
+                {currentDog.dogName} se situe à 6 km de vous !
               </IonText>
             </IonCol>
           </IonRow>
@@ -104,29 +103,41 @@ function WalkSomeoneDogConfirm() {
             <IonCol>
               <IonImg
                 style={{ height: "200px" }}
-                src={currentDog.profile_picture}
+                src={`https://firebasestorage.googleapis.com/v0/b/dogwalkdev.appspot.com/o/dogs%2F${currentDog.profile_picture}?alt=media&token=3a344a22-004d-472b-8f7b-813e40c8d7af`}
               />
             </IonCol>
           </IonRow>
 
           <IonRow class="ion-justify-content-center ion-text-center">
             <IonCol>
-              <IonText class="text-md">
-                Vous pouvez aller chercher {currentDog.dogName} chez{" "}
-                {currentDog.owner} à 14h15 !
-              </IonText>
+              {currentDog.available_at ? (
+                <IonText class="text-md">
+                  Vous pouvez aller chercher {currentDog.dogName} chez{" "}
+                  {currentDog.owner} le {currentDog.available_at}
+                </IonText>
+              ) : (
+                <IonText>
+                  {currentDog.dogName} n'est pas disponible pour le moment !
+                </IonText>
+              )}
             </IonCol>
           </IonRow>
 
           <IonRow class="ion-justify-content-center ion-text-center">
             <IonCol>
-              <IonButton
-                onClick={attributeDog}
-                color="primary"
-                href="page/HomePage"
-              >
-                Valider l'action
-              </IonButton>
+              {currentDog.available_at ? (
+                <IonButton
+                  onClick={attributeDog}
+                  color="primary"
+                  href="page/HomePage"
+                >
+                  Valider l'action
+                </IonButton>
+              ) : (
+                <IonButton color="primary" href="page/WalkSomeoneDog">
+                  Voir les autres chiens
+                </IonButton>
+              )}
             </IonCol>
           </IonRow>
         </IonGrid>

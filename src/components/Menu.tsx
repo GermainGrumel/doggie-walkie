@@ -12,17 +12,11 @@ import {
 
 import { useLocation } from "react-router-dom";
 import {
-  archiveOutline,
-  archiveSharp,
-  bookmarkOutline,
-  heartOutline,
-  heartSharp,
-  mailOutline,
-  mailSharp,
-  paperPlaneOutline,
-  paperPlaneSharp,
-  warningOutline,
-  warningSharp,
+  checkboxOutline,
+  happyOutline,
+  homeOutline,
+  personOutline,
+  walkOutline,
 } from "ionicons/icons";
 import "./Menu.css";
 
@@ -37,32 +31,32 @@ const appPages: AppPage[] = [
   {
     title: "Homepage",
     url: "/page/HomePage",
-    iosIcon: mailOutline,
-    mdIcon: mailSharp,
+    iosIcon: homeOutline,
+    mdIcon: homeOutline,
   },
   {
     title: "Faire promener mon chien",
     url: "/page/WalkMyDog",
-    iosIcon: paperPlaneOutline,
-    mdIcon: paperPlaneSharp,
+    iosIcon: checkboxOutline,
+    mdIcon: checkboxOutline,
   },
   {
     title: "Promener un chien",
     url: "/page/WalkSomeoneDog",
-    iosIcon: heartOutline,
-    mdIcon: heartSharp,
+    iosIcon: walkOutline,
+    mdIcon: walkOutline,
   },
   {
     title: "Mes promenades",
-    url: "/page/Promenades",
-    iosIcon: archiveOutline,
-    mdIcon: archiveSharp,
+    url: "/page/LastWalks",
+    iosIcon: happyOutline,
+    mdIcon: happyOutline,
   },
   {
     title: "Account",
     url: "/page/Account",
-    iosIcon: warningOutline,
-    mdIcon: warningSharp,
+    iosIcon: personOutline,
+    mdIcon: personOutline,
   },
 ];
 
@@ -73,8 +67,8 @@ const Menu: React.FC = () => {
     <IonMenu contentId="main" type="overlay">
       <IonContent>
         <IonList id="inbox-list">
-          <IonListHeader>DogWalker</IonListHeader>
-          <IonNote>A walking dog is a happy dog</IonNote>
+          <IonListHeader>Ilda</IonListHeader>
+          <IonNote>I Love Dogs Altogether</IonNote>
           {appPages.map((appPage, index) => {
             return (
               <IonMenuToggle key={index} autoHide={false}>

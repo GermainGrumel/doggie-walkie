@@ -1,41 +1,16 @@
 import App from "./App";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import reportWebVitals from "./reportWebVitals";
-import { Provider, useStore } from "react-redux";
-import { createStore, applyMiddleware, combineReducers } from "redux";
-import authReducer from "./store/reducers/authReducer";
-import firebase from "firebase/compat/app";
-
+import { Provider } from "react-redux";
 import ReactDOM from "react-dom";
-import thunk from "redux-thunk";
-import {
-  ReactReduxFirebaseProvider,
-  firebaseReducer,
-} from "react-redux-firebase";
+import { createStore } from "redux";
+import { authReducer } from "./store/reducers/authReducer";
 
-const rrfConfig = {
-  userProfile: "users",
-};
-
-const rootReducer = combineReducers({
-  firebase: firebaseReducer,
-  auth: authReducer,
-});
-
-export const store = createStore(rootReducer, applyMiddleware(thunk));
-const rrfProps = {
-  firebase,
-  config: rrfConfig,
-  dispatch: store.dispatch,
-  // createFirestoreInstance // <- needed if using firestore
-};
-console.log(rrfProps);
+const store = createStore(authReducer);
 
 ReactDOM.render(
   <Provider store={store}>
-    <ReactReduxFirebaseProvider {...rrfProps}>
-      <App />
-    </ReactReduxFirebaseProvider>
+    <App />
   </Provider>,
   document.getElementById("root")
 );

@@ -26,6 +26,8 @@ import WalkSomeoneDog from "./WalkSomeoneDog";
 import WalkSomeoneDogConfirm from "./WalkSomeoneDogConfirm";
 import WalkMyDog from "./WalkMyDog";
 import { useStore } from "react-redux";
+import LastWalks from "./LastWalks";
+import UserProfile from "./UserProfile";
 
 const Page: React.FC = () => {
   const { name } = useParams<{ name: string }>();
@@ -57,6 +59,10 @@ const Page: React.FC = () => {
             key={shortid.generate()}
           ></WalkSomeoneDogConfirm>
         );
+      case "LastWalks":
+        return <LastWalks key={shortid.generate()}></LastWalks>;
+      case "UserProfile":
+        return <UserProfile key={shortid.generate()}></UserProfile>;
       default:
     }
   };
@@ -80,6 +86,10 @@ const Page: React.FC = () => {
         return "Inscris ton chien !";
       case "WalkSomeoneDog":
         return "Promener le chien de quelqu'un !";
+      case "UserProfile":
+        return "Profil";
+      case "LastWalks":
+        return "Mes dernières promenades";
       default:
         return name;
     }
@@ -102,9 +112,7 @@ const Page: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">{nav}</IonButtons>
-          <IonTitle>
-            <div className="ion-text-center text-xxxl">{title}</div>
-          </IonTitle>
+          <IonTitle className="ion-text-center">{title}</IonTitle>
         </IonToolbar>
       </IonHeader>
       {ContentComponent}

@@ -22,7 +22,7 @@ import {
   eyeOffOutline,
 } from "ionicons/icons";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -45,29 +45,34 @@ import "../theme/variables.css";
 
 // Firebase REALTIME DATABASE
 import { getDatabase, ref, set, child, get, push } from "firebase/database";
-import { auth, registerUser } from "../config/firebase";
+import { registerUser, loginUser } from "../config/firebase";
 // CUSTOM STYLES
 import "../styles/Login.scss";
 import { useHistory } from "react-router";
-import { store } from "../index";
+import {
+  fetchUsersData,
+  getCurrentTime,
+  writeUserDataFromRegistration,
+} from "../utils/utils";
 
 const Login: React.FC = () => {
   // CONNEXION
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [cpassword, setCPassword] = useState<string>("");
 
   // INSCRIPTION
-  const [pass, setPass] = useState<string>("");
-  const [passConfirm, setPassConfirm] = useState<string>("");
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [familyName, setFamilyName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [gender, setGender] = useState<string>("");
+  const [pass, setPass] = useState<string>("");
+  const [passConfirm, setPassConfirm] = useState<string>("");
+
+  // TOAST
   const [message, setMessage] = useState<string>("");
   const [color, setColor] = useState<string>("");
   const [showToast, setShowToast] = useState(false);
+
+  // DISPLAYS
   const [showConnexion, setShowConnexion] = React.useState(true);
   const [showInscription, setShowInscription] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
@@ -76,88 +81,74 @@ const Login: React.FC = () => {
 
   const history = useHistory();
   const db = getDatabase();
-
   const dbRef = ref(db);
   const newUserUid = push(child(ref(db), "users")).key;
+  const currentTime = getCurrentTime();
 
-  const today = new Date(),
-    current_time =
-      today.getFullYear() +
-      "-" +
-      (today.getMonth() + 1) +
-      "-" +
-      today.getDate();
-  // https://firebase.google.com/docs/database/web/lists-of-data
-
-  const readUserData = () => {
-    get(child(dbRef, `users}`))
-      .then((userData) => {
-        if (userData.exists()) {
-          const userFromDB = userData.val();
-          console.log('userFromDB["newUserUid"] :>> ', userFromDB);
-        } else {
-          console.log("No data available");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  const getInscription = () => {
+    setShowInscription(true);
+    setShowConnexion(false);
   };
-  const writeUserData = () => {
-    signUpRules();
+  const getConnexion = () => {
+    setShowInscription(false);
+    setShowConnexion(true);
+  };
 
-    const userData = {
-      username: name + " " + familyName,
-      gender: gender,
-      password: pass,
-      email: email,
-      phoneNumber: phoneNum,
-      id: newUserUid,
-      creation_date: current_time,
-    };
-    if (data) {
-      const setData = (userData: any) => ({
-        type: "SET_USER",
-        id: newUserUid,
-        user: userData, // défini plus haut
-      });
-      store.dispatch(setData(userData));
-      // Redux affiche user
-      try {
-        set(ref(db, "users/" + newUserUid), userData).then(() => {
-          // auth.currentUser = [userData];
-          // getCurrentUser();
-          history.push("/page/HomePage");
-        });
-      } catch (e) {
-        console.log("ERROR FROM SIGN UP", e);
-      }
+  async function login() {
+    const res = await loginUser(username, password);
+    if (!res) {
+      setColor("danger");
+      setMessage(
+        "L'utilisateur n'existe pas. Veuillez vérifier vos informations."
+      );
+      setShowToast(true);
+    } else {
+      setColor("success");
+      setMessage("Bienvenue !");
+      setShowToast(true);
+      history.push("/page/HomePage");
     }
-  };
+    console.log(`${res ? "Login success" : "Login failed"}`);
+  }
 
   async function register() {
-    if (password !== cpassword) {
-      setColor("danger");
-      setMessage("Les mots de passe ne correspondent pas");
-      setShowToast(true);
-    }
-    if (username.trim() === "" || password.trim() === "") {
+    if (
+      name.trim() === "" ||
+      pass.trim() === "" ||
+      familyName.trim() === "" ||
+      email.trim() === ""
+    ) {
       setColor("danger");
       setMessage("Le mot de passe ne peut pas être vide");
       setShowToast(true);
     }
-    const res = await registerUser(username, password);
-    console.log("res :>> ", res);
-    if (res) {
-      setColor("success");
-      setMessage(`Bienvenue ${username}`);
+    signUpRules();
+
+    const response: any = await writeUserDataFromRegistration(
+      name,
+      familyName,
+      pass,
+      email,
+      newUserUid,
+      currentTime
+    );
+    console.log("response :>> ", response);
+    const res: any = await registerUser(email, pass);
+    if (!res) {
+      setColor("danger");
+      setMessage("Un incident technique s'est produit.");
       setShowToast(true);
-      history.push("/page/HomePage");
+    } else {
+      setColor("success");
+      setMessage("Bienvenue !");
+      setShowToast(true);
+      window.location.replace("/page/HomePage");
     }
   }
 
-  /* ON ENLEVE LA PREMIERE LETTRE DU TELEPHONE POUR EVITER DES +3306  */
-  const phoneNum: string = "+33" + phoneNumber.substring(1);
+  useEffect(() => {
+    fetchUsersData(dbRef);
+  }, []);
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -174,13 +165,6 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleAddClickInscription = () => {
-    setShowInscription(!showInscription);
-    if (showConnexion === true) {
-      setShowConnexion(false);
-    }
-  };
-
   const emailCheck =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
       email
@@ -189,23 +173,9 @@ const Login: React.FC = () => {
   async function signUpRules() {
     try {
       setShowToast(false);
-      if (
-        email === "" ||
-        pass === "" ||
-        name === "" ||
-        familyName === "" ||
-        phoneNumber === ""
-      ) {
+      if (email === "" || pass === "" || name === "" || familyName === "") {
         setColor("danger");
         setMessage("Tous les champs sont obligatoires");
-        setShowToast(true);
-        return;
-      }
-      if (phoneNumber.length !== 10 || !phoneNumber.match(/^-?\d+$/)) {
-        setColor("danger");
-        setMessage(
-          "Votre numéro de téléphone est invalide : vous devez entrer un numéro de mobile à 10 chiffres."
-        );
         setShowToast(true);
         return;
       }
@@ -231,7 +201,7 @@ const Login: React.FC = () => {
         setShowToast(true);
         return;
       }
-      //  window.location.href = "/Page/HomePage";
+      // window.location.href = "/Page/HomePage";
     } catch (error) {
       setColor("danger");
       setMessage(
@@ -247,18 +217,20 @@ const Login: React.FC = () => {
       <div className="page-login ion-padding-top">
         <div className="ion-text-center">
           <IonImg className="logo" src="assets/icon/logo.png" />
-          <IonText className="slogan text-md" color="dark">
+          <IonText
+            className="slogan text-md ion-padding ion-margin"
+            color="dark"
+          >
             Prenez soin de votre animal de compagnie préféré !
           </IonText>
-          <IonButton color="primary" onClick={() => handleAddClickConnexion()}>
-            J'ai déjà un compte
-          </IonButton>
-          <IonButton
-            color="primary"
-            onClick={() => handleAddClickInscription()}
-          >
-            Je veux m'inscrire
-          </IonButton>
+          {showConnexion ? null : (
+            <IonButton
+              color="primary"
+              onClick={() => handleAddClickConnexion()}
+            >
+              J'ai déjà un compte
+            </IonButton>
+          )}
         </div>
         <IonToast
           isOpen={showToast}
@@ -286,7 +258,7 @@ const Login: React.FC = () => {
                 onIonChange={(e) => setUsername(e.detail.value!)}
                 clearInput
                 value={username}
-              ></IonInput>
+              />
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Mot de passe</IonLabel>
@@ -297,36 +269,22 @@ const Login: React.FC = () => {
                 onIonChange={(e) => setPassword(e.detail.value!)}
                 clearInput
                 value={password}
-              ></IonInput>
+              />{" "}
             </IonItem>
-            <IonItem>
-              <IonLabel position="floating">
-                Confirmez votre mot de passe
-              </IonLabel>
-              <IonInput
-                type="password"
-                required
-                placeholder="Confirmez votre mot de passe "
-                onIonChange={(e) => setCPassword(e.detail.value!)}
-                clearInput
-                value={cpassword}
-              ></IonInput>
-            </IonItem>
-            <IonRow>
+            <IonRow className="ion-align-items-center ion-justify-content-center ">
               <IonButton
-                onClick={register}
+                onClick={login}
                 className="ion-margin-top"
                 type="submit"
               >
-                Créer un compte
+                Se connecter
               </IonButton>
-              <IonButton
-                onClick={readUserData}
-                className="ion-margin-top"
-                type="submit"
-              >
-                Fonction
-              </IonButton>
+              <IonText className="text-lg ion-margin-top" color="medium">
+                Pas encore de compte ?{" "}
+                <IonText color="primary" onClick={getInscription}>
+                  Inscrivez vous !
+                </IonText>
+              </IonText>
             </IonRow>
           </>
         ) : null}
@@ -340,20 +298,6 @@ const Login: React.FC = () => {
               <div className="register-mandatory ion-text-center">
                 <IonText>Tous les champs sont obligatoires</IonText>
               </div>
-
-              {/* GENDER */}
-              <IonItem>
-                <IonLabel color="dark">Civilité</IonLabel>
-                <IonSelect
-                  value={gender}
-                  okText="OK"
-                  cancelText="Fermer"
-                  onIonChange={(e) => setGender(e.detail.value!)}
-                >
-                  <IonSelectOption value="monsieur">Monsieur</IonSelectOption>
-                  <IonSelectOption value="madame">Madame</IonSelectOption>
-                </IonSelect>
-              </IonItem>
 
               {/* PRENOM */}
               <IonItem>
@@ -384,24 +328,26 @@ const Login: React.FC = () => {
               {/* EMAIL */}
 
               {emailCheck === false ? (
-                <IonItem>
-                  <IonLabel position="floating" color="dark">
-                    E-mail :
-                  </IonLabel>
-                  <IonInput
-                    type="email"
-                    value={email}
-                    onIonChange={(e) => setEmail(e.detail.value!)}
-                    placeholder="Ex : monmail@gmail.com"
-                  ></IonInput>
-                  <IonIcon
-                    className="ion-justify-content-center ion-align-self-center"
-                    slot="end"
-                    size="medium"
-                    color="danger"
-                    icon={closeCircleOutline}
-                  ></IonIcon>
-                </IonItem>
+                <>
+                  <IonItem>
+                    <IonLabel position="floating" color="dark">
+                      E-mail :
+                    </IonLabel>
+                    <IonInput
+                      type="email"
+                      value={email}
+                      onIonChange={(e) => setEmail(e.detail.value!)}
+                      placeholder="Ex : monmail@gmail.com"
+                    ></IonInput>
+                    <IonIcon
+                      className="ion-justify-content-center ion-align-self-center"
+                      slot="end"
+                      size="medium"
+                      color="danger"
+                      icon={closeCircleOutline}
+                    ></IonIcon>
+                  </IonItem>
+                </>
               ) : (
                 <IonItem>
                   <IonLabel position="floating" color="dark">
@@ -412,48 +358,6 @@ const Login: React.FC = () => {
                     value={email}
                     onIonChange={(e) => setEmail(e.detail.value!)}
                     placeholder="Ex : monmail@gmail.com"
-                  ></IonInput>
-                  <IonIcon
-                    className="ion-justify-content-center ion-align-self-center"
-                    slot="end"
-                    color="success"
-                    icon={checkmarkCircleOutline}
-                    size="medium"
-                  ></IonIcon>
-                </IonItem>
-              )}
-
-              {/* TELEPHONE */}
-
-              {phoneNumber.length !== 10 || !phoneNumber.match(/^-?\d+$/) ? (
-                <IonItem>
-                  <IonLabel position="floating" color="dark">
-                    N° tel mobile : (10 chiffres.)
-                  </IonLabel>
-                  <IonInput
-                    type="tel"
-                    value={phoneNumber}
-                    onIonChange={(e) => setPhoneNumber(e.detail.value!)}
-                    placeholder="Ex : 0612345678"
-                  ></IonInput>
-                  <IonIcon
-                    className="ion-justify-content-center ion-align-self-center"
-                    slot="end"
-                    size="medium"
-                    color="danger"
-                    icon={closeCircleOutline}
-                  ></IonIcon>
-                </IonItem>
-              ) : (
-                <IonItem>
-                  <IonLabel position="floating" color="dark">
-                    N° tel mobile : (10 chiffres)
-                  </IonLabel>
-                  <IonInput
-                    type="tel"
-                    value={phoneNumber}
-                    onIonChange={(e) => setPhoneNumber(e.detail.value!)}
-                    placeholder="Ex : 0612345678"
                   ></IonInput>
                   <IonIcon
                     className="ion-justify-content-center ion-align-self-center"
@@ -626,11 +530,15 @@ const Login: React.FC = () => {
 
               {/* SUBMIT */}
               <div className="ion-padding-vertical"></div>
-              <IonButton expand="full" onClick={writeUserData} color="primary">
+              <IonButton expand="full" onClick={register} color="primary">
                 Inscription
               </IonButton>
               <div className="ion-margin-top ion-text-center">
-                <IonRouterLink class="text-xl" color="dark" href="/">
+                <IonRouterLink
+                  class="text-xl"
+                  color="dark"
+                  onClick={getConnexion}
+                >
                   Retour
                 </IonRouterLink>
               </div>

@@ -1,0 +1,19 @@
+.walkSomeoneDog {
+  background-color: #FBEEEB;
+}
+
+.avatar-overflow {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: (1fr)[100];
+      grid-template-columns: repeat(100, 1fr);
+  row-gap: 50px;
+  grid-auto-rows: minmax(50px, auto);
+  justify-items: center;
+  overflow-y: scroll;
+}
+
+.avatar-overflow ion-avatar {
+  margin: 0 10px;
+}
+/*# sourceMappingURL=WalkMyDog.css.map */

@@ -27,10 +27,25 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "./theme/variables.css";
+import { useEffect } from "react";
+import { getCurrentUser } from "./config/firebase";
+import { useDispatch } from "react-redux";
+import { setUserState } from "./store/actions/userActions";
 
 setupIonicReact();
 
 const App: React.FC = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    getCurrentUser().then((user: any) => {
+      if (user) {
+        dispatch(setUserState(user));
+      } else {
+        if (window.location.pathname === "/page/Login") return;
+        window.location.replace("/page/Login");
+      }
+    });
+  });
   return (
     <IonApp>
       <IonReactRouter>

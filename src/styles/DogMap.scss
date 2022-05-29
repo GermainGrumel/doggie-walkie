@@ -1,0 +1,43 @@
+div.gm-svpc,
+.gm-control-active, .gm-fullscreen-control, .gmnoprint{
+    display: none;
+}
+
+.menu-container{
+        display: flex;
+
+.menu-items{
+    z-index: 20;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    background: var(--ion-color-light);
+    display: flex;
+        }
+.menu-item{
+    position: absolute;
+    bottom: 18%;
+    right: 10%;
+}
+.menu-item-2{
+    position: absolute;
+    bottom: 25%;
+    right: 10%; 
+}
+.menu-item-3{
+    position: absolute;
+    bottom: 18%;
+    right: 24%; 
+}
+.menu-item-4{
+    position: absolute;
+    bottom: 32%;
+    right: 10%; 
+}
+
+.menu-item-5{
+    position: absolute;
+    bottom: 18%;
+    right: 38%; 
+}
+}

@@ -16,5 +16,5 @@ You can install the app with your favourite terminal and by running :
 ```npm install && npm run start```
 
 ## The project won't work since you don't have access to API Keys and the .env file
-For reason securities, you don't have access to those, feel free to message me on the email displayed on my github profile if you want to have access to those
+For reason securities, you don't have access to those, feel free to message me on the twitter displayed on my github profile if you want to have access to those
 

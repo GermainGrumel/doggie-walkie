@@ -56,10 +56,18 @@ export async function loginUser(email: string, password: string) {
   }
 }
 
-export async function registerUser(email: string, password: string) {
+export async function registerUser(
+  email: string,
+  password: string,
+  username: string
+) {
   try {
-    const res = await createUserWithEmailAndPassword(auth, email, password);
-    console.log("res", res);
+    const response = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    updateUserProfile(username);
     return true;
   } catch (error: any) {
     console.log("error", error);

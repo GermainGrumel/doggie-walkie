@@ -3,39 +3,27 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonImg,
   IonText,
-  IonButton,
   IonCard,
   IonCardHeader,
-  IonCardSubtitle,
   IonCardTitle,
   IonCardContent,
   IonItem,
-  IonAvatar,
-  IonTitle,
-  IonList,
   IonIcon,
 } from "@ionic/react";
 import React from "react";
-import { useParams } from "react-router";
-import { useStore } from "react-redux";
 import { powerOutline } from "ionicons/icons";
 import "../styles/Account.scss";
 import { logoutUser } from "../config/firebase";
 
-const Account: React.FC = () => {
-  // eslint-disable-next-line
-  const { name } = useParams<{ name: string }>();
-  const state = useStore().getState();
-  const user = state.user;
+const Account: React.FC = ({ currentUser }: any) => {
+  console.log("currentUserrrrrr :>> ", currentUser);
   return (
     <IonContent className="page-account">
-      <div className="background-container">
-        <IonImg className="background-cover" src="assets/images/account.jpg" />
-      </div>
       <div className="user-name ion-text-center">
-        <IonText className="text-xxl">Bienvenue Germain</IonText>
+        <IonText className="text-xxl">
+          Que souhaites-tu faire {currentUser?.username} ?
+        </IonText>
       </div>
 
       <div className="ion-text-center ion-padding-top top-text">
@@ -53,23 +41,24 @@ const Account: React.FC = () => {
                 <IonCardTitle>Mes informations</IonCardTitle>
                 <IonItem href="/page/Infos" detail={true} lines="none">
                   <IonCardContent className="ion-padding-top">
-                    Consulte les données de ton compte Ilda et sélectionne les
-                    informations à enregistrer pour personnaliser ton expérience
-                    Ilda.
+                    Consulte les données de ton compte DogWalker et modifies-y
+                    tes informations
                   </IonCardContent>
                 </IonItem>
               </IonCardHeader>
             </IonCard>
           </IonCol>
+        </IonRow>
 
+        <IonRow className="ion-align-self-center">
           <IonCol>
             <IonCard>
               <IonCardHeader>
-                <IonCardTitle>Mes dernières promenades</IonCardTitle>
-                <IonItem href="/page/LastWalks" detail={true} lines="none">
+                <IonCardTitle>Inscrire mon chien</IonCardTitle>
+                <IonItem href="/page/RegisterDog" detail={true} lines="none">
                   <IonCardContent className="ion-padding-top">
-                    Consulte les dernières promenades que tu as effectué ou que
-                    ton chien a effectué !
+                    Inscris ton chien pour pouvoir que les autres utilisateurs
+                    puissent le promener à ta place !
                   </IonCardContent>
                 </IonItem>
               </IonCardHeader>
@@ -79,7 +68,7 @@ const Account: React.FC = () => {
 
         {/* SECOND ROW */}
 
-        <IonRow className="ion-align-self-center">
+        {/* <IonRow className="ion-align-self-center">
           <IonCol>
             <IonCard>
               <IonCardHeader>
@@ -94,44 +83,18 @@ const Account: React.FC = () => {
               </IonCardHeader>
             </IonCard>
           </IonCol>
-        </IonRow>
+        </IonRow> */}
 
         {/* SECOND ROW */}
         <IonRow className="ion-align-self-center">
           <IonCol>
-            <IonCard>
-              <IonCardHeader>
-                <IonCardTitle>
-                  Conditions Générales d'Utilisation et RGPD
-                </IonCardTitle>
-                <IonItem href="/page/Cgurgpd" detail={true} lines="none">
-                  <IonCardContent className="ion-padding-top">
-                    Retrouvez ici les Conditions Générales d'Utilisation et les
-                    Mentions Légales de Ilda. Découvrez également comment nous
-                    utilisons les cookies dans le respect de la RPGD.
-                  </IonCardContent>
-                </IonItem>
-              </IonCardHeader>
-            </IonCard>
-          </IonCol>
-        </IonRow>
-
-        <IonRow className="logout-card">
-          <IonCol>
-            <IonItem
-              detail={false}
-              // onClick={(e) => {
-              //   logout();
-              // }}
-            >
+            <IonItem>
               <IonCard onClick={logoutUser}>
                 <IonCardHeader>
-                  <IonRow className="next-to-each-other">
-                    <IonIcon color="primary" icon={powerOutline} />
-                    <IonCardTitle>Se déconnecter</IonCardTitle>
-                  </IonRow>
+                  <IonIcon color="primary" icon={powerOutline} />
+                  <IonCardTitle>Se déconnecter</IonCardTitle>
                   <IonCardContent className="ion-padding margin-auto ion-text-center">
-                    Se déconnecter de Ilda.
+                    Se déconnecter de DogWalker.
                   </IonCardContent>
                 </IonCardHeader>
               </IonCard>

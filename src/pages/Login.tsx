@@ -23,6 +23,7 @@ import {
 } from "ionicons/icons";
 
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -45,7 +46,7 @@ import "../theme/variables.css";
 
 // Firebase REALTIME DATABASE
 import { getDatabase, ref, set, child, get, push } from "firebase/database";
-import { registerUser, loginUser } from "../config/firebase";
+import { registerUser, loginUser, updateUserProfile } from "../config/firebase";
 // CUSTOM STYLES
 import "../styles/Login.scss";
 import { useHistory } from "react-router";
@@ -77,7 +78,6 @@ const Login: React.FC = () => {
   const [showInscription, setShowInscription] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = React.useState(false);
-  const [data, setData] = React.useState(false);
 
   const history = useHistory();
   const db = getDatabase();
@@ -127,13 +127,13 @@ const Login: React.FC = () => {
     const response: any = await writeUserDataFromRegistration(
       name,
       familyName,
-      pass,
       email,
       newUserUid,
       currentTime
     );
     console.log("response :>> ", response);
-    const res: any = await registerUser(email, pass);
+    const usernameFromRegistration: string = `${name} ${familyName}`;
+    const res: any = await registerUser(email, pass, usernameFromRegistration);
     if (!res) {
       setColor("danger");
       setMessage("Un incident technique s'est produit.");
@@ -142,7 +142,7 @@ const Login: React.FC = () => {
       setColor("success");
       setMessage("Bienvenue !");
       setShowToast(true);
-      window.location.replace("/page/HomePage");
+      window.location.replace("/page/Welcome");
     }
   }
 
@@ -210,7 +210,6 @@ const Login: React.FC = () => {
       setShowToast(true);
       return;
     }
-    return setData(true);
   }
   return (
     <IonContent>
@@ -223,14 +222,6 @@ const Login: React.FC = () => {
           >
             Prenez soin de votre animal de compagnie préféré !
           </IonText>
-          {showConnexion ? null : (
-            <IonButton
-              color="primary"
-              onClick={() => handleAddClickConnexion()}
-            >
-              J'ai déjà un compte
-            </IonButton>
-          )}
         </div>
         <IonToast
           isOpen={showToast}
@@ -530,7 +521,7 @@ const Login: React.FC = () => {
 
               {/* SUBMIT */}
               <div className="ion-padding-vertical"></div>
-              <IonButton expand="full" onClick={register} color="primary">
+              <IonButton expand="full" onClick={register}>
                 Inscription
               </IonButton>
               <div className="ion-margin-top ion-text-center">

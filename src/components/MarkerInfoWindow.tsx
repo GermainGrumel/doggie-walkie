@@ -15,26 +15,30 @@ import {
 import { getDatabase, ref } from "firebase/database";
 import {
   footstepsOutline,
-  heartOutline,
   locationOutline,
-  navigateOutline,
   personOutline,
   phonePortraitOutline,
 } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
-import { fetchDogsData } from "../utils/utils";
+import {
+  fetchDogsData,
+  fetchUsersData,
+  findCurrentUser,
+  writeDogData,
+  writeUserData,
+} from "../utils/utils";
+import { getAuth } from "firebase/auth";
 
-// interface Marker {
-//   latitude: number;
-//   longitude: number;
-//   name: string;
-//   owner_id: string;
-//   profile_picture: string;
-//   breed: string;
-//   available_at: string;
-//   marker?: any;
-//   id: string;
-// }
+interface Marker {
+  latitude: number;
+  longitude: number;
+  username: string;
+  hasDog: boolean;
+  walkingDogId: string;
+  creation_date: string;
+  marker?: any;
+  id: string;
+}
 
 interface selectedDog {
   age: string;
@@ -47,34 +51,53 @@ interface selectedDog {
   id: string;
   owner_id: string;
   profile_picture: string;
+  taken: boolean;
 }
 
-export const MarkerInfoWindow: any = (marker: any, dog: any, dismiss: any) => {
+export const MarkerInfoWindow: any = ({ marker }: Marker) => {
   const [showLoading, setShowLoading] = useState(true);
   const [dogs, setDogs] = useState([]);
   const [selectedDog, setSelectedDog] = useState<selectedDog>();
-  const markerObject = marker.marker;
+  const [currentUser, setCurrentUser] = useState<any>();
+  const [users, setUsers] = useState([]);
 
   const db = getDatabase();
   const dbRef = ref(db);
-  console.log("marker :>> ", marker.marker);
+  const auth: any = getAuth();
+
+  const getCurrentUser: any = async () => {
+    let findUser = await findCurrentUser(users, auth.currentUser.email);
+    setCurrentUser(findUser);
+  };
+  console.log("marker :>> ", marker);
 
   const getDogData = async () => {
     const dogsFromDatabase = await fetchDogsData(dbRef);
+    const usersFromDatabase = await fetchUsersData(dbRef);
     setDogs(dogsFromDatabase);
-    const owner: any = dogs.find(
-      (element: any) => element.owner_id === markerObject.id.toString()
+    setUsers(usersFromDatabase);
+    const currentDog: any = dogs.find(
+      (element: any) => element.owner_id === marker.id.toString()
     );
-    setSelectedDog(owner);
-    console.log("owner :>> ", owner);
+    setSelectedDog(currentDog);
   };
-
+  const setTakenDog = () => {
+    writeDogData(selectedDog, selectedDog?.available_at, true);
+    const walkingDogIdSet = writeUserData(currentUser, selectedDog?.id);
+    console.log("walkingDogIdSet :>> ", walkingDogIdSet);
+    setTimeout(function () {
+      window.location.reload();
+    }, 10000);
+  };
+  console.log("currentUser :>> ", currentUser);
+  console.log("selectedDog :>> ", selectedDog);
   useEffect(() => {
     getDogData();
+    getCurrentUser();
   }, [showLoading]);
   return (
     <IonContent>
-      {markerObject && selectedDog?.dogName ? (
+      {marker && selectedDog?.dogName ? (
         <IonGrid className="ion-padding" style={{ height: "350px" }}>
           <IonRow className="ion-margin-bottom">
             <IonCol size="3">
@@ -102,7 +125,7 @@ export const MarkerInfoWindow: any = (marker: any, dog: any, dismiss: any) => {
                 style={{ fontSize: "1.5rem" }}
               />
             </IonCol>
-            <IonCol size="10">{markerObject?.username}</IonCol>
+            <IonCol size="10">{marker?.username}</IonCol>
           </IonRow>
 
           <IonRow className="ion-justify-content-start ion-align-items-center">
@@ -114,7 +137,7 @@ export const MarkerInfoWindow: any = (marker: any, dog: any, dismiss: any) => {
               />
             </IonCol>
             <IonCol size="10">
-              {markerObject?.lat} {markerObject?.lng}
+              {marker?.latitude} {marker?.longitude}
             </IonCol>
           </IonRow>
 
@@ -135,13 +158,29 @@ export const MarkerInfoWindow: any = (marker: any, dog: any, dismiss: any) => {
 
           <IonRow className="ion-align-items-center ion-text-center ion-margin-top">
             <IonCol size="12" className="ion-margin-bottom">
-              <IonButton
-                href={`page/WalkSomeoneDogConfirm/${selectedDog?.id}`}
-                disabled={selectedDog?.available_at ? false : true}
-              >
-                <IonIcon icon={footstepsOutline} />
-                <IonText className="text-lg ion-padding-left">Réserver</IonText>
-              </IonButton>
+              {selectedDog?.taken ? (
+                <IonButton
+                  onClick={setTakenDog}
+                  // href={`page/WalkSomeoneDogConfirm/${selectedDog?.id}`}
+                  disabled
+                >
+                  <IonIcon icon={footstepsOutline} />
+                  <IonText className="text-lg ion-padding-left">
+                    {selectedDog?.dogName} a déjà été reservé !
+                  </IonText>
+                </IonButton>
+              ) : (
+                <IonButton
+                  onClick={setTakenDog}
+                  // href={`page/WalkSomeoneDogConfirm/${selectedDog?.id}`}
+                  disabled={selectedDog?.available_at ? false : true}
+                >
+                  <IonIcon icon={footstepsOutline} />
+                  <IonText className="text-lg ion-padding-left">
+                    Réserver
+                  </IonText>
+                </IonButton>
+              )}
             </IonCol>
           </IonRow>
         </IonGrid>
@@ -151,7 +190,7 @@ export const MarkerInfoWindow: any = (marker: any, dog: any, dismiss: any) => {
             isOpen={showLoading}
             onDidDismiss={() => setShowLoading(false)}
             message={"Chargement en cours..."}
-            duration={5000}
+            duration={10}
           />
         </>
       )}

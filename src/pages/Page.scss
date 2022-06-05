@@ -40,6 +40,14 @@ summary {
   }
 }
 
+ion-button{
+  color:white;
+  background-color: var(--ion-color-primary);
+  width: 250px !important;
+  border-radius: 15px;
+  font-size: 14px !important;
+}
+
 // Text Modification
 .text-xxxxl {
   font-size: 36px;

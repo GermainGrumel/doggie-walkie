@@ -1,12 +1,18 @@
 import {
   IonApp,
+  IonBadge,
+  IonIcon,
+  IonLabel,
   IonRouterOutlet,
   IonSplitPane,
+  IonTabBar,
+  IonTabButton,
+  IonTabs,
   setupIonicReact,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router-dom";
-import Menu from "./components/Menu";
+// import Menu from "./components/Menu";
 import Page from "./pages/Page";
 
 /* Core CSS required for Ionic components to work properly */
@@ -31,6 +37,7 @@ import { useEffect } from "react";
 import { getCurrentUser } from "./config/firebase";
 import { useDispatch } from "react-redux";
 import { setUserState } from "./store/actions/userActions";
+import { calendar, informationCircle, map, personCircle } from "ionicons/icons";
 
 setupIonicReact();
 
@@ -50,7 +57,6 @@ const App: React.FC = () => {
     <IonApp>
       <IonReactRouter>
         <IonSplitPane contentId="main">
-          <Menu />
           <IonRouterOutlet id="main">
             <Route path="/" exact={true}>
               <Redirect to="/page/HomePage" />

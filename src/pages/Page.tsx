@@ -28,10 +28,10 @@ import WalkMyDog from "./WalkMyDog";
 import { useStore } from "react-redux";
 import LastWalks from "./LastWalks";
 import UserProfile from "./UserProfile";
+import { Welcome } from "./Welcome";
 
 const Page: React.FC = () => {
   const { name } = useParams<{ name: string }>();
-  const state = useStore().getState();
   const { id } = useParams<{ id: string }>();
 
   // route to view with shortid generated
@@ -63,6 +63,8 @@ const Page: React.FC = () => {
         return <LastWalks key={shortid.generate()}></LastWalks>;
       case "UserProfile":
         return <UserProfile key={shortid.generate()}></UserProfile>;
+      case "Welcome":
+        return <Welcome key={shortid.generate()}></Welcome>;
       default:
     }
   };
@@ -90,6 +92,8 @@ const Page: React.FC = () => {
         return "Profil";
       case "LastWalks":
         return "Mes dernières promenades";
+      case "Welcome":
+        return "Bienvenue !";
       default:
         return name;
     }

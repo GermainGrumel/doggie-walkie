@@ -1,59 +1,46 @@
 import {
   IonContent,
-  IonGrid,
   IonRow,
   IonCol,
   IonText,
   IonButton,
-  IonCard,
-  IonCardHeader,
-  IonCardSubtitle,
   IonItem,
-  IonAvatar,
-  IonTitle,
-  IonToast,
-  IonImg,
-  IonIcon,
-  IonList,
   IonLabel,
-  IonItemOptions,
-  IonItemSliding,
-  IonItemOption,
   IonModal,
   IonInput,
   IonLoading,
-  useIonViewWillEnter,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router";
-import { useDispatch, useSelector } from "react-redux";
-import { child, get, getDatabase, ref } from "firebase/database";
+import { useParams } from "react-router";
 import "../styles/HomePage.scss";
-import { fetchDogsData, fetchUsersData, findCurrentUser } from "../utils/utils";
-import { setUserState } from "../store/actions/userActions";
-import { updateUserProfile } from "../config/firebase";
-import GeolocationButton from "../components/GeolocationButton";
 import DogMap from "../components/DogMap";
-import { arrowForwardOutline, pawOutline, starOutline } from "ionicons/icons";
+import { fetchDogsData, fetchUsersData, findCurrentUser } from "../utils/utils";
+import { getDatabase, ref } from "firebase/database";
+import { Walk } from "../components/Walk";
+import { getAuth } from "firebase/auth";
+
+interface User {
+  latitude: number;
+  longitude: number;
+  username: string;
+  hasDog: boolean;
+  walkingDogId: string;
+  creation_date: string;
+  marker?: any;
+  id: string;
+}
+
 const HomePage: React.FC = () => {
   const { name } = useParams<{ name: string }>();
-  const state = useSelector((state: any) => state);
+  const auth: any = getAuth();
   const db = getDatabase();
   const dbRef = ref(db);
-  const dispatch = useDispatch();
-  const history = useHistory();
-
-  const [chosenDog, setChosenDog] = useState("");
+  const [username, setUsername] = useState<string>("");
+  const [currentUser, setCurrentUser] = useState<User>();
+  const [users, setUsers] = useState([]);
   const [dogs, setDogs] = useState([]);
-  const [username, setUsername] = useState("");
-  const [users, setUsers] = useState<any[]>([]);
-  const [currentUser, setCurrentUser] = useState<any>({});
-  const [showToast, setShowToast] = useState(false);
-  const [message, setMessage] = useState<string>("");
-  const [color, setColor] = useState<string>("");
-  const [searchText, setSearchText] = useState("");
-  const [showLoading, setShowLoading] = useState(true);
   const [showModal, setShowModal] = useState(true);
+  const [showLoading, setShowLoading] = useState(true);
 
   const fetchDatasFromDatabase = async () => {
     const dogsFromDatabase: any = await fetchDogsData(dbRef);
@@ -64,16 +51,18 @@ const HomePage: React.FC = () => {
     }
   };
 
-  useIonViewWillEnter(() => getCurrentUser());
-  console.log("state :>> ", state);
-  const getCurrentUser = () => {
-    let findUser = findCurrentUser(users, state);
+  const getCurrentUser: any = async () => {
+    let findUser: User = await findCurrentUser(users, auth.currentUser.email);
     setCurrentUser(findUser);
   };
+
   useEffect(() => {
     fetchDatasFromDatabase();
     getCurrentUser();
   }, [showLoading]);
+  useEffect(() => {
+    getCurrentUser();
+  }, [users, dogs]);
 
   const firstLogin = (
     <>
@@ -120,8 +109,32 @@ const HomePage: React.FC = () => {
   );
 
   return (
-    <IonContent class="page-home">
-      <DogMap />
+    <IonContent class="page-home" fullscreen>
+      {currentUser ? (
+        currentUser?.walkingDogId ? (
+          <Walk currentUser={currentUser} dogs={dogs} />
+        ) : currentUser && dogs && users ? (
+          <DogMap currentUser={currentUser} dogs={dogs} users={users} />
+        ) : (
+          <>
+            <IonLoading
+              isOpen={showLoading}
+              onDidDismiss={() => setShowLoading(false)}
+              message={"Chargement en cours..."}
+              duration={3000}
+            />
+          </>
+        )
+      ) : (
+        <>
+          <IonLoading
+            isOpen={showLoading}
+            onDidDismiss={() => setShowLoading(false)}
+            message={"Chargement en cours..."}
+            duration={3000}
+          />
+        </>
+      )}
     </IonContent>
   );
 };

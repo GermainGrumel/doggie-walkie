@@ -15,7 +15,6 @@ import {
   IonAvatar,
   IonImg,
   IonIcon,
-  IonSearchbar,
   IonLoading,
 } from "@ionic/react";
 
@@ -29,8 +28,14 @@ import {
   uploadString,
 } from "firebase/storage";
 import { dogBreeds } from "../realtimeDatabase/database";
-import { fetchUsersData, findCurrentUser } from "../utils/utils";
-import { useSelector } from "react-redux";
+import {
+  fetchUsersData,
+  findCurrentUser,
+  writeDogDataFromRegistration,
+  writeUserDataWithLocation,
+} from "../utils/utils";
+import { getAuth } from "firebase/auth";
+import "../styles/Account.scss";
 function RegisterDog() {
   // INSCRIPTION
   const [name, setName] = useState<string>("");
@@ -49,7 +54,7 @@ function RegisterDog() {
   const db = getDatabase();
   const dbRef = ref(db);
   const newDogUid = push(child(ref(db), "dogs")).key;
-  const state = useSelector((state: any) => state);
+  const auth: any = getAuth();
 
   const today = new Date(),
     current_time =
@@ -68,7 +73,7 @@ function RegisterDog() {
   };
 
   const getCurrentUser = async () => {
-    const loggedUser = findCurrentUser(users, state);
+    const loggedUser = findCurrentUser(users, auth.currentUser.email);
     setCurrentUser(loggedUser);
   };
   useEffect(() => {
@@ -76,33 +81,31 @@ function RegisterDog() {
   }, [showLoading]);
   useEffect(() => {
     getCurrentUser();
-  }, [users]);
+  }, [users, showLoading]);
 
-  const writeDogData = async () => {
+  const registerDog = async () => {
     await signUpRules();
-    const dogData = {
-      dogName: name,
-      gender: gender,
-      age: age,
-      breed: breed,
-      profile_picture: photos[0] ? photos[0].filepath : defaultDogPicture,
-      owner_id: currentUser.id,
-      id: newDogUid,
-      available_at: "",
-      description: "",
-      creation_date: current_time,
-    };
-    try {
-      if (data) {
-        set(ref(db, "dogs/" + newDogUid), dogData).then(() => {
-          window.location.href = "/page/HomePage";
-        });
-      }
-    } catch (e) {
-      console.log("ERROR FROM SIGN UP DOG", e);
-    }
+    const register_dog = writeDogDataFromRegistration(
+      name,
+      gender,
+      age,
+      breed,
+      photos,
+      defaultDogPicture,
+      currentUser,
+      current_time,
+      newDogUid
+    );
+    console.log("register_dog :>> ", register_dog);
+    writeUserDataWithLocation(
+      currentUser,
+      currentUser.latitude,
+      currentUser.longitude,
+      currentUser.walkingDogId,
+      true
+    );
+    window.location.href = "page/HomePage";
   };
-
   async function signUpRules() {
     try {
       setShowToast(false);
@@ -140,10 +143,10 @@ function RegisterDog() {
   useEffect(() => {
     setProfilePicture(photos[0]);
   }, [photos]);
-
+  console.log("currentUser", currentUser);
   return (
     <IonGrid slot="sign-up" id="sign-up">
-      {users[0] && currentUser?.id ? (
+      {users && currentUser?.id ? (
         <>
           <IonToast
             isOpen={showToast}
@@ -172,15 +175,11 @@ function RegisterDog() {
                   />
                 </IonAvatar>
                 <div className="add-avatar">
-                  <div>
-                    <IonIcon
-                      icon={addOutline}
-                      onClick={takePhoto}
-                      onChange={(e: any) =>
-                        setProfilePicture(e.target.value[0])
-                      }
-                    />
-                  </div>
+                  <IonIcon
+                    icon={addOutline}
+                    onClick={takePhoto}
+                    onChange={(e: any) => setProfilePicture(e.target.value[0])}
+                  />
                 </div>
               </IonCol>
             </IonRow>
@@ -197,8 +196,10 @@ function RegisterDog() {
               </IonRow>
             ) : null}
             {/* GENDER */}
-            <IonItem>
-              <IonLabel color="dark">Sexe</IonLabel>
+            <IonItem style={{ width: "80vw" }}>
+              <IonLabel position="floating" color="dark">
+                Sexe
+              </IonLabel>
               <IonSelect
                 value={gender}
                 okText="OK"
@@ -236,7 +237,9 @@ function RegisterDog() {
             </IonItem>
             {/* BREED */}
             <IonItem>
-              <IonLabel color="dark">Race du chien</IonLabel>
+              <IonLabel position="floating" color="dark">
+                Race du chien
+              </IonLabel>
 
               <IonSelect
                 value={breed}
@@ -259,7 +262,7 @@ function RegisterDog() {
 
             <div className="ion-padding-vertical"></div>
 
-            <IonButton expand="full" onClick={writeDogData} color="primary">
+            <IonButton expand="full" color="primary" onClick={registerDog}>
               Inscription
             </IonButton>
 

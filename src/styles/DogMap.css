@@ -1,0 +1,28 @@
+div.gm-svpc,
+.gm-control-active, .gm-fullscreen-control, .gmnoprint {
+  display: none;
+}
+
+.menu-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.menu-container .menu-items {
+  z-index: 20;
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  background: var(--ion-color-light);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.menu-container .menu-item {
+  position: absolute;
+  bottom: 25%;
+  right: 12%;
+}
+/*# sourceMappingURL=DogMap.css.map */

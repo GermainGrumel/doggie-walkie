@@ -10,7 +10,7 @@
 
 ## Install the App
 You can install the app with your favourite terminal and by running :
-```make dogwalker```
+```make dog-walker```
 
 ### If you don't have 'make' command installed
 ```npm install && npm run start```
